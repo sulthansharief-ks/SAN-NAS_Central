@@ -3,7 +3,7 @@
 **Time is money.** But in storage, time is also log consistency, Kerberos authentication, and Snapshot schedules. If your NetApp cluster drifts even by a few minutes, your Active Directory users might get locked out! 😱
 
 Follow this guide to set up Network Time Protocol (NTP) from scratch.
-
+![NTP Architecture diagram](media/Gemini_Generated_Image_tv17t8tv17t8tv17.png)
 ---
 
 ## 🧐 1. The "Before We Start" Check
