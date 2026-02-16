@@ -4,7 +4,7 @@
 Security 101 says "Least Privilege." If a junior admin only needs to check volume space, they shouldn't have the power to delete the entire cluster. 
 
 This guide walks you through creating custom Roles, Users, and locking down your NetApp cluster like a fortress.
-
+![NetApp RBAC Schematic Diagram](media/Gemini_Generated_Image_b7wmpdb7wmpdb7wm.png)
 ---
 
 ## 🧠 1. The Core Concepts
