@@ -2,6 +2,8 @@
 
 This guide covers the entire lifecycle of a NetApp Aggregate: from identifying spare disks and calculating RAID groups to creation, daily maintenance, and safe decommissioning.
 ## The Aggregate provides the physical storage blocks, and WAFL manages the logical organization of those blocks.
+
+![Aggregate Architecture](media/Gemini_Generated_Image_xzc9ybxzc9ybxzc9.png)
 ---
 
 ## 📋 Table of Contents
