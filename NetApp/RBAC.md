@@ -4,7 +4,69 @@
 Security 101 says "Least Privilege." If a junior admin only needs to check volume space, they shouldn't have the power to delete the entire cluster. 
 
 This guide walks you through creating custom Roles, Users, and locking down your NetApp cluster like a fortress.
-![NetApp RBAC Schematic Diagram](/media/Gemini_Generated_Image_b7wmpdb7wmpdb7wm.png)
+<!--![NetApp RBAC Schematic Diagram](/media/Gemini_Generated_Image_b7wmpdb7wmpdb7wm.png)-->
+
+```mermaid
+graph TD
+    %% --- Neon Dark Mode Definitions ---
+    classDef user fill:#001529,stroke:#00aaff,stroke-width:2px,color:#fff
+    classDef roleBox fill:#0d1117,stroke:#8a2be2,stroke-width:3px,color:#8a2be2,stroke-dasharray: 8 4
+    classDef genericRule fill:#1a1a1a,stroke:#00ff44,stroke-width:2px,color:#00ff44
+    classDef specificRule fill:#1a1a1a,stroke:#ff3333,stroke-width:2px,color:#ff3333
+    classDef process fill:#1a0000,stroke:#ff3333,stroke-width:3px,color:#fff
+    classDef result fill:#000,stroke:#ffaa00,stroke-width:2px,color:#ffaa00
+
+    %% --- Nodes ---
+    User((User: builder_bob))
+    
+    subgraph Role_Scope [Role: Builder_NoDelete]
+        direction TB
+        
+        subgraph Generic_Block [Generic Rules]
+            direction LR
+            R1_Cmd(cmddir: DEFAULT)
+            R1_Access(Access: all)
+        end
+
+        subgraph Specific_Block [Specific Overrides]
+            direction LR
+            R2_Cmd(cmddir: volume delete)
+            R2_Access(Access: none)
+        end
+    end
+
+    CheckProcess{ONTAP Permission Check}
+    Status(Final Access Status)
+
+    %% --- Logic Flow & "Animation" ---
+    User ==>|Logs In| Role_Scope
+    
+    %% The Fallback Path
+    R1_Cmd --- R1_Access
+    R1_Access -.->|1. Default Match| CheckProcess
+
+    %% The Priority Path (Override)
+    R2_Cmd --- R2_Access
+    R2_Access ==>|2. OVERRIDE MATCH| CheckProcess
+
+    CheckProcess ==> Status
+
+    %% --- Apply Styles ---
+    class User user
+    class Role_Scope roleBox
+    class R1_Cmd,R1_Access genericRule
+    class R2_Cmd,R2_Access specificRule
+    class CheckProcess process
+    class Status result
+
+    %% --- Link Styling (Neon Glow) ---
+    %% User Entry (Cyan)
+    linkStyle 0 stroke:#00aaff,stroke-width:3px
+    %% Generic Path (Dashed Green)
+    linkStyle 2 stroke:#00ff44,stroke-width:2px,stroke-dasharray: 5 5
+    %% Specific Path (Solid Red Glow)
+    linkStyle 4 stroke:#ff3333,stroke-width:5px
+```
 ---
 
 ## 🧠 1. The Core Concepts
