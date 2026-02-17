@@ -1,16 +1,15 @@
 # 📦 NetApp ONTAP (9.x) — Volume Operations (Scratch ➜ Advanced) 🚀
-> ✅ **Rule:** This cheat-sheet sticks to **volume-scoped commands only** (i.e., commands that start with `volume ...`).  
+> ✅ **Rule:** This cheat-sheet sticks to **volume-scoped commands only** (i.e., commands that start with `volume ...`).
 > 🏷️ Replace placeholders like `<SVM> <VOL> <AGGR> <SIZE>` etc.
 
 ---
 
-## 🧰 0) Quick CLI Helpers (still volume-focused)
+## 🧰 0) Quick CLI Helpers (Exceptions to the rule)
 - `man volume`
-- `man volume create`
 - `volume ?`
 - `volume create ?`
-- `set -privilege advanced`  ⚙️
-- `set -privilege admin`     ✅
+- `set -privilege advanced`   ⚙️
+- `set -privilege admin`      ✅
 
 ---
 
@@ -21,7 +20,7 @@
 ### 1.2 NAS-style create (with junction path)
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -state online -junction-path /<VOL>`
 
-### 1.3 Common create options (pick what you need)
+### 1.3 Common create options
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -state online -comment "App volume"`
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -space-guarantee none`
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -snapshot-policy default`
@@ -50,8 +49,8 @@
 ---
 
 ## 🟢🔴 3) State Operations (online/offline/restrict)
-- `volume online  -vserver <SVM> -volume <VOL>`
-- `volume offline -vserver <SVM> -volume <VOL>`
+- `volume online   -vserver <SVM> -volume <VOL>`
+- `volume offline  -vserver <SVM> -volume <VOL>`
 - `volume restrict -vserver <SVM> -volume <VOL>`  ⚠️ (restricted state for some ops)
 
 ---
@@ -228,7 +227,7 @@ Rename:
 
 ---
 
-## 🧾 14) Quotas (volume quota) — **NEW quota policy created + applied**
+## 🧾 14) Quotas (volume quota)
 > ✅ This section **creates a new quota policy** (not using `default`), adds rules to it, assigns it to the volume, then compiles quotas.
 
 ### 14.1 Create a NEW quota policy
@@ -261,17 +260,17 @@ Assign your new policy:
 Show quota status:
 - `volume quota show -vserver <SVM> -volume <VOL>`
 
-Enable quotas (first time compilation):
-- `volume quota on     -vserver <SVM> -volume <VOL>`
+Enable quotas (first time compilation) — *Use -foreground to wait for completion*:
+- `volume quota on     -vserver <SVM> -volume <VOL> -foreground`
 
 If quotas were already on and you changed rules/policy:
-- `volume quota resize -vserver <SVM> -volume <VOL>`
+- `volume quota resize -vserver <SVM> -volume <VOL> -foreground`
 
 Report effective quotas:
 - `volume quota report -vserver <SVM> -volume <VOL>`
 
 Disable quotas:
-- `volume quota off    -vserver <SVM> -volume <VOL>`
+- `volume quota off    -vserver <SVM> -volume <VOL> -foreground`
 
 ---
 
@@ -285,8 +284,8 @@ Disable quotas:
 Show deleted volumes:
 - `volume recovery-queue show`
 
-Restore:
-- `volume recovery-queue restore -vserver <SVM> -volume <VOL>`
+Restore (Recover):
+- `volume recovery-queue recover -vserver <SVM> -volume <VOL>`
 
 Purge permanently ☠️:
 - `volume recovery-queue purge -vserver <SVM> -volume <VOL>`
@@ -300,10 +299,3 @@ Purge permanently ☠️:
 - `volume snapshot show -vserver <SVM> -volume <VOL>`
 - `volume efficiency show -vserver <SVM> -volume <VOL> -instance`
 - `volume move show -vserver <SVM> -volume <VOL>`
-
----
-
-## ✅ Mini Tips
-- 🧭 Always run `man <command>` on your cluster (options differ slightly across ONTAP versions).
-- 📸 Before risky ops (delete/restore/move), create a snapshot first.
-- 🧩 If you want this **even stricter** (ONLY commands literally starting with `volume ` and remove `man` / `set -privilege`), tell me and I’ll trim it.
