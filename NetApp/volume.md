@@ -272,6 +272,21 @@ Report effective quotas:
 Disable quotas:
 - `volume quota off    -vserver <SVM> -volume <VOL> -foreground`
 
+### 14.5 Qtree-Specific Quota Workflow (The "Tree Quota")
+> ⚠️ **Note:** You do not assign policies to Qtrees. You assign the policy to the **Volume**, then add a **Tree Rule** for the specific Qtree.
+
+1. **Identify the Volume's active policy:**
+   - `volume show -vserver <SVM> -volume <VOL> -fields quota-policy`
+
+2. **Add a "Tree Rule" to that policy:** (e.g., limit Qtree to 50GB)
+   - `volume quota policy rule create -vserver <SVM> -policy-name <CURRENT_POLICY_NAME> -volume <VOL> -type tree -target <QTREE_NAME> -disk-limit 50GB`
+
+3. **Activate the change (Resize):**
+   - `volume quota resize -vserver <SVM> -volume <VOL> -foreground`
+
+4. **Verify:**
+   - `volume quota report -vserver <SVM> -volume <VOL> -qtree <QTREE_NAME>`
+
 ---
 
 ## 🗑️ 15) Delete + Recovery Queue (safer deletes)
