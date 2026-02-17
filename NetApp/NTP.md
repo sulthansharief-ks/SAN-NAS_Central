@@ -3,7 +3,65 @@
 **Time is money.** But in storage, time is also log consistency, Kerberos authentication, and Snapshot schedules. If your NetApp cluster drifts even by a few minutes, your Active Directory users might get locked out! 😱
 
 Follow this guide to set up Network Time Protocol (NTP) from scratch.
-![NTP Architecture diagram](/media/NTP.png)
+<!-- ![NTP Architecture diagram](/media/NTP.png) -->
+
+```mermaid
+graph TD
+    %% --- Neon Dark Mode Theme Definitions ---
+    classDef cluster fill:#001e26,stroke:#00b8ff,stroke-width:3px,shadow:0 0 15px #00b8ff,color:#fff
+    classDef primary fill:#002b00,stroke:#00ff41,stroke-width:2px,color:#fff
+    classDef secondary fill:#331a00,stroke:#ffaa00,stroke-width:2px,color:#fff
+    classDef tertiary fill:#2b2600,stroke:#ffff00,stroke-width:2px,color:#fff
+    classDef troubleshooting fill:#161b22,stroke:#8b949e,stroke-width:2px,color:#fff
+    classDef action fill:#21262d,stroke:#ff0055,stroke-width:2px,color:#fff
+
+    %% --- NTP Server Nodes ---
+    subgraph NTP_Sources [Time Sources]
+        direction TB
+        P_NTP(Primary NTP Server)
+        S_NTP(Secondary NTP Server)
+        T_NTP(Tertiary NTP Server)
+    end
+
+    %% --- NetApp Cluster Node ---
+    subgraph Target [ONTAP Environment]
+        Cluster[NetApp Cluster <br/> System Time & Date]
+    end
+
+    %% --- Troubleshooting & Verification ---
+    %% Using a wider box name and separate lines to prevent overlap
+    subgraph Verify [Troubleshooting Section]
+        direction TB
+        Ping[Ping Test - Reachability]
+        Logs[Event Log - NTP Messages]
+    end
+
+    Cleanup(Cleanup: Remove Old Servers)
+
+    %% --- Connections ---
+    P_NTP ==> Cluster
+    S_NTP -- Sync --> Cluster
+    T_NTP -- Sync --> Cluster
+
+    Cluster -.-> Ping
+    Cluster -.-> Logs
+    Cluster ==> Cleanup
+
+    %% --- Apply Styles ---
+    class Cluster cluster
+    class P_NTP primary
+    class S_NTP secondary
+    class T_NTP tertiary
+    class Ping,Logs troubleshooting
+    class Cleanup action
+
+    %% --- Link Styles ---
+    linkStyle 0 stroke:#00ff41,stroke-width:3px
+    linkStyle 1 stroke:#ffaa00,stroke-width:2px
+    linkStyle 2 stroke:#ffff00,stroke-width:2px
+    linkStyle 3,4 stroke:#8b949e,stroke-width:2px,stroke-dasharray: 5 5
+    linkStyle 5 stroke:#ff0055,stroke-width:3px
+```
 ---
 
 ## 🧐 1. The "Before We Start" Check
