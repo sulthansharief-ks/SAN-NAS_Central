@@ -10,7 +10,7 @@ make make a note and prepare how you're going to create share from scratch
 NFS
 vol show -vserver <nfs_vserver>
 vserver show -vserver <nfs_vserver>
-ex
+check export policy permission of an volume/qtree and check for root vol permission, check if root vol and nfs vol is using the same export policy
 
 
 
