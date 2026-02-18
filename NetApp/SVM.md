@@ -2,6 +2,103 @@
 > ✅ **Rule:** This cheat-sheet sticks to **SVM/vserver-scoped CLI commands** (commands that start with `vserver ...`).
 > 🏷️ Replace placeholders like `<SVM> <AGGR> <IPSPACE> <DOMAIN> <DNS1> ...`
 
+
+```mermaid
+
+%%{init: {
+  "theme": "dark",
+  "flowchart": { "curve": "basis", "padding": 12 },
+  "themeVariables": {
+    "fontFamily": "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
+    "background": "#0d1117",
+    "primaryColor": "#161b22",
+    "primaryTextColor": "#e6edf3",
+    "primaryBorderColor": "#30363d",
+    "lineColor": "#8b949e",
+    "secondaryColor": "#0b2f4a",
+    "tertiaryColor": "#1f6feb",
+    "clusterBkg": "#0d1117",
+    "clusterBorder": "#30363d",
+    "titleColor": "#e6edf3",
+    "edgeLabelBackground": "#0d1117"
+  }
+}}%%
+
+flowchart TB
+
+%% ---------- Styles ----------
+classDef top fill:#161b22,stroke:#30363d,color:#e6edf3,stroke-width:1px;
+classDef svc fill:#0b2f4a,stroke:#1f6feb,color:#e6edf3,stroke-width:1px;
+classDef vol fill:#0f2d1a,stroke:#2ea043,color:#e6edf3,stroke-width:1px;
+classDef aggr fill:#2d2a1b,stroke:#d29922,color:#e6edf3,stroke-width:1px;
+classDef lif fill:#2a1215,stroke:#f85149,color:#e6edf3,stroke-width:1px;
+
+%% ---------- Top actors ----------
+CLIENT["Client App"]:::top
+ADMIN["Admin or Automation"]:::top
+ACCESS["Client mounts SVM\nvia data LIF IPs"]:::top
+
+CLIENT --> ACCESS
+
+%% ---------- Cluster hardware (where LIFs and aggregates live) ----------
+subgraph CLUSTER["NetApp Cluster Hardware"]
+direction LR
+
+  subgraph N1["Node 1"]
+  direction TB
+  LIF1["SVM Data LIF A\nIP <LIF_IP_A>\nHome node 1"]:::lif
+  AG1["Aggregate <AGGR1>"]:::aggr
+  end
+
+  subgraph N2["Node 2"]
+  direction TB
+  LIF2["SVM Data LIF B\nIP <LIF_IP_B>\nHome node 2"]:::lif
+  AG2["Aggregate <AGGR2>"]:::aggr
+  end
+end
+
+ACCESS --> LIF1
+ACCESS --> LIF2
+
+%% ---------- SVM logical space (spans nodes) ----------
+subgraph SVMLOG["SVM Logical Space"]
+direction TB
+
+SVMID["SVM: <SVM>\nLogical container spanning nodes"]:::top
+
+PROT["Protocols\nNFS server\nSMB CIFS server\niSCSI target FCP service"]:::svc
+NSSVC["Name Services\nDNS\nLDAP\nNIS\nns-switch"]:::svc
+POLICY["Access Control\nExport policies\nSMB share ACL\nigroup mapping"]:::svc
+SEC["Security\nKerberos\nAD integration\nLocal users and groups"]:::svc
+NAMESPACE["Namespace\nJunction paths\nQtrees optional"]:::svc
+
+VROOT["Root volume\n<SVM>_root"]:::vol
+VOL1["Data volume <VOL1>\nJunction /<VOL1>"]:::vol
+VOL2["Data volume <VOL2>\nJunction /<VOL2>"]:::vol
+
+SVMID --> PROT
+SVMID --> NSSVC
+SVMID --> POLICY
+SVMID --> SEC
+SVMID --> NAMESPACE
+
+NAMESPACE --> VOL1
+NAMESPACE --> VOL2
+SVMID --> VROOT
+
+end
+
+%% ---------- How traffic maps ----------
+LIF1 --> SVMID
+LIF2 --> SVMID
+ADMIN --> SVMID
+
+%% ---------- Where volumes are hosted ----------
+VROOT -->|Hosted on| AG1
+VOL1  -->|Hosted on| AG1
+VOL2  -->|Hosted on| AG2
+
+```
 ---
 
 ## 🧰 0) Quick CLI Helpers
