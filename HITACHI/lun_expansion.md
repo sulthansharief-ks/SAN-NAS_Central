@@ -19,7 +19,7 @@ This SOP defines the process for increasing the capacity of an existing **Virtua
 
 ## **3. Procedure 🛠️**
 
-![v-vol_operations](HITACHI/media/hitachi vols.png)
+![v-vol_operations](/HITACHI/media/hitachi vols.png)
 
 ### **Step 1: System Access 🌐**
 * Log in to **Hitachi Storage Navigator** via the SVP IP address.
