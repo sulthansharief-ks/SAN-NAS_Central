@@ -22,33 +22,38 @@ This SOP provides the standardized steps to safely remove **LUN paths** and deco
 * Log in to the **Hitachi Storage Navigator** via the SVP IP address.
 * Ensure you are viewing the correct storage system serial number on the homepage.
 
-### **Step 2: Remove LUN Paths (Unmapping) 🔗**
+### **Step 2: Performance Verification (IOPS Check) 📉**
+*Before unmapping, you must confirm the IOPS graph is flat to avoid cutting off a live production service.*
+* In the left-hand explorer panel, navigate to **Analytics** or **Performance Monitor**.
+* Select **LDEV** from the resource list.
+* Search for the specific **LDEV IDs** you intend to decommission.
+* Select the **I/O Rate (IOPS)** metric and view the real-time or historical graph.
+* **Verification:** Confirm that the IOPS for these LDEVs is **0** or shows a consistently **flat line**. If activity is detected, stop the procedure and identify the active host.
+
+### **Step 3: Remove LUN Paths (Unmapping) 🔗**
 * Navigate to **Ports / Host Groups / iSCSI Targets** in the left explorer panel.
 * Select the specific **Host Group** associated with the decommissioned server.
 * Click the **LUNs** tab in the main display window to view all volumes currently mapped to that host.
 * Select the LUNs intended for removal and click the **Remove LUN Paths** button.
 * **Final Review**: Confirm the list of LUNs to ensure no production volumes are included, then click **Finish** followed by **Apply**.
 
-### **Step 3: Delete Host Group (Optional) ✖️**
+### **Step 4: Delete Host Group (Optional) ✖️**
 * Return to the **Host Group** list after the LUN paths are successfully removed.
 * If the server is being permanently retired, select the empty **Host Group**.
-* Click **Delete Host Group** to clear WWN registrations from the storage ports, freeing them for new assignments.
+* Click **Delete Host Group** to clear WWN registrations from the storage ports.
 
-### **Step 4: Reclaim or Delete LDEVs ♻️**
+### **Step 5: Reclaim or Delete LDEVs ♻️**
 * Navigate to the **Logical Devices** or **Pools** section.
 * Locate the **LDEV IDs** that were just unmapped.
-* **Re-use Option**: You may leave the LDEV intact for future mapping to a different server.
-* **Deletion Option**: If the data is no longer needed, select the LDEV and click **Delete LDEV**.
-* **Note**: For Dynamic Provisioning, deleting the LDEV automatically returns the capacity to the storage pool.
+* **Deletion Option**: If the data is no longer needed, select the LDEV and click **Delete LDEV**. For Dynamic Provisioning, this returns the capacity to the storage pool.
 
 ---
 
 ## **4. Verification ✅**
 * Open the **Tasks** window to monitor job progress.
 * Confirm the "Remove LUN Paths" and "Delete Host Group" tasks reach a **Completed** status.
-* Verify the **Pools** summary to see that unallocated capacity has increased (if LDEVs were deleted).
+* Verify the **Pools** summary to see that unallocated capacity has increased.
 
 ---
-**Prepared by:** Sulthan Sharief K S
+**Prepared by:** Sulthan Sharief K S  
 **Last Updated:** February 2026
-
