@@ -57,3 +57,65 @@ This SOP outlines the standardized process for creating Host Groups and provisio
 ---
 
 **Would you like me to create a troubleshooting guide for common "Task Failed" errors in Storage Navigator?**
+
+
+### **🚀 Standard Operating Procedure: Mapping Existing LDEVs to Host Groups**
+**System:** Hitachi VSP G-Series / F-Series / G1000 / G1500  
+**Management Tool:** Hitachi Storage Navigator (Device Manager - Storage Navigator)  
+
+---
+
+## **1. Purpose 🎯**
+This SOP provides the exact steps to establish a connection (LUN Path) between an existing **Logical Device (LDEV)** and a **Host Group**. This process—often called **LUN Mapping**—makes storage volumes visible to specific servers.
+
+---
+
+## **2. Prerequisites 📋**
+* **LDEV Status:** The target LDEV must already be created and formatted.
+* **Host Group Status:** The Host Group must already exist, with at least one Host WWN registered.
+* **Login Credentials:** Authorized access to the SVP management interface.
+
+---
+
+## **3. Procedure 🛠️**
+
+### **Step 1: Locate the Target Host Group 🖥️**
+* Open your browser and log in to **Hitachi Device Manager - Storage Navigator**.
+* In the left-hand explorer panel, expand the **Storage Systems** tree and select your storage array.
+* Navigate to **Ports / Host Groups / iSCSI Targets**.
+* In the list, find the specific **Host Group** you want to map storage to.
+
+### **Step 2: Initiate the "Add LUN Paths" Wizard 🔗**
+* Select the checkbox next to your target **Host Group**.
+* Click the **Add LUN Paths** button (usually located above the list or under the "More Actions" menu).
+* A new wizard window will appear labeled **Add LUN Paths**.
+
+### **Step 3: Select the LDEVs to Map 💾**
+* The wizard will display a list of **Available LDEVs** (volumes not currently mapped to this group).
+* **Filter/Search:** Use the filter tool to find your LDEV by its **LDEV ID** or **LDEV Name**.
+* Select the desired LDEV(s) and click the **Add** button to move them to the "Selected LDEVs" table.
+* Click **Next**.
+
+### **Step 4: Configure LUN IDs 🔢**
+* In the **LUN ID** column, the system will automatically suggest the next available LUN number (e.g., LUN 0, LUN 1).
+* **Manual Override:** If your organization requires a specific LUN ID, you can manually edit it here.
+* Click **Next** to proceed to the confirmation screen.
+
+### **Step 5: Review and Commit ✅**
+* Review the summary table showing the **Port ID**, **Host Group Name**, and the assigned **LDEV IDs** and **LUN IDs**.
+* Click **Finish**.
+* A confirmation dialog will appear. Click **Apply** to submit the task to the storage controllers.
+
+---
+
+## **4. Verification & Host Discovery 🔍**
+* **Monitor Task:** Go to the **Tasks & Alerts** window to ensure the status changes to **Completed**.
+* **Host-Side Action:** * Log in to the target server.
+    * **VMware:** Perform a "Rescan Storage" on the HBA.
+    * **Windows:** Open "Disk Management" and select "Action > Rescan Disks".
+    * **Linux:** Run `rescan-scsi-bus.sh` or scan the specific host class in `/sys/class/fc_host/`.
+* The new volume should now appear as an uninitialized disk.
+
+---
+
+**Would you like me to help you create a "LUN Unmapping" SOP for decommissioning old servers?**
