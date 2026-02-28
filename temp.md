@@ -146,4 +146,4 @@ flowchart LR
   3. Select "HC-05" and enter the default PIN (usually `1234` or `0000`).
 * **🎉 Success:** The module pairs successfully with your phone, and the fast-blinking LED on the HC-05 slows down, confirming the connection.
 
-Would you like me to draft the full unified circuit layout for the final build next?
+### Prepared by: _Sulthan Sharief K S_
