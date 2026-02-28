@@ -5,7 +5,8 @@ When opening a Service Request (SR) with Hitachi Vantara Support for hardware fa
 Here is exactly what they need and how to securely collect it. 🚀
 
 ---
-
+![hp](/HITACHI/media/homepage.png)
+![hp](/HITACHI/media/maint.png)
 ## **1. The "Holy Grail" of Hitachi Logs: The System Dump 📦**
 The System Dump is a compressed archive containing everything Hitachi engineering needs to diagnose the array. There are two types, but you will use the first one 99% of the time:
 
