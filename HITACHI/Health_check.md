@@ -61,5 +61,4 @@ Record the following daily:
 * **Critical Tasks Result**: (Success/Failure)
 
 ---
-**Prepared by:** Sulthan Sharief K S  
-**Last Updated:** February 2026
+
