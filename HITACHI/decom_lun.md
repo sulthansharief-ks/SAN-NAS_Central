@@ -55,5 +55,4 @@ This SOP provides the standardized steps to safely remove **LUN paths** and deco
 * Verify the **Pools** summary to see that unallocated capacity has increased.
 
 ---
-**Prepared by:** Sulthan Sharief K S  
-**Last Updated:** February 2026
+
