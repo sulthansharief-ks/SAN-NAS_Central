@@ -188,6 +188,5 @@ This SOP outlines the standardized process for creating Host Groups and provisio
 | **Mode Mismatch** | Incorrect Host Mode (e.g., missed Mode 21). | Verify OS-specific mode and required options (54/63). |
 
 ---
-**Prepared by:** Sulthan Sharief K S
-**Last Updated:** February 2026
+
 
