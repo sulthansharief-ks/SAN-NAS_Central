@@ -79,5 +79,4 @@ This SOP defines the monthly administrative tasks required to maintain the long-
 * Submit the report to the IT Infrastructure Manager or relevant stakeholders.
 
 ---
-**Prepared by:** Storage Administration Team  
-**Last Updated:** February 2026
+
