@@ -59,5 +59,4 @@ This SOP defines the process for increasing the capacity of an existing **Virtua
 * **Meta-Resource Restrictions**: Ensure the LDEV is not reserved by a specialized meta-resource group that prohibits configuration changes.
 
 ---
-**Prepared by:** Sulthan Sharief K S  
-**Last Updated:** February 2026
+
