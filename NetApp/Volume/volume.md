@@ -2,8 +2,28 @@
 > ✅ **Rule:** This cheat-sheet sticks to **volume-scoped commands only** (i.e., commands that start with `volume ...`).
 > 🏷️ Replace placeholders like `<SVM> <VOL> <AGGR> <SIZE>` etc.
 
+## 📑 Table of Contents
+1. [🧰 0) Quick CLI Helpers](#quick-cli)
+2. [🆕 1) Create a Volume (from scratch)](#create-volume)
+3. [👀 2) Show / Inventory / Inspect](#show-inventory)
+4. [🟢🔴 3) State Operations (online/offline/restrict)](#state-ops)
+5. [🧷 4) Mount / Unmount (Junction Path for NAS volumes)](#mount-unmount)
+6. [✍️ 5) Modify / Rename / Comment](#modify-rename)
+7. [📏 6) Resize (Grow/Shrink) + Autosize](#resize)
+8. [🗜️ 7) Efficiency (Dedup/Compression/Compaction)](#efficiency)
+9. [📸 8) Snapshots (volume snapshot operations)](#snapshots)
+10. [🧬 9) FlexClone (Volume Clones)](#flexclone)
+11. [🚚 10) Volume Move (between aggregates)](#volume-move)
+12. [🔐 11) Volume Encryption (if supported)](#encryption)
+13. [☁️ 12) Volume Tiering (FabricPool volume settings)](#tiering)
+14. [🌲 13) Qtrees (volume qtree)](#qtrees)
+15. [🧾 14) Quotas (volume quota)](#quotas)
+16. [🗑️ 15) Delete + Recovery Queue (safer deletes)](#delete-recovery)
+17. [🧠 16) “Power” One-Liners (volume-only)](#power-oneliners)
+
 ---
 
+<a id="quick-cli"></a>
 ## 🧰 0) Quick CLI Helpers (Exceptions to the rule)
 - `man volume`
 - `volume ?`
@@ -13,6 +33,7 @@
 
 ---
 
+<a id="create-volume"></a>
 ## 🆕 1) Create a Volume (from scratch)
 ### 1.1 Basic create
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -state online`
@@ -29,6 +50,7 @@
 
 ---
 
+<a id="show-inventory"></a>
 ## 👀 2) Show / Inventory / Inspect
 ### 2.1 List volumes
 - `volume show`
@@ -48,6 +70,7 @@
 
 ---
 
+<a id="state-ops"></a>
 ## 🟢🔴 3) State Operations (online/offline/restrict)
 - `volume online   -vserver <SVM> -volume <VOL>`
 - `volume offline  -vserver <SVM> -volume <VOL>`
@@ -55,6 +78,7 @@
 
 ---
 
+<a id="mount-unmount"></a>
 ## 🧷 4) Mount / Unmount (Junction Path for NAS volumes)
 ### 4.1 Show junction
 - `volume show -vserver <SVM> -volume <VOL> -fields junction-path`
@@ -68,6 +92,7 @@
 
 ---
 
+<a id="modify-rename"></a>
 ## ✍️ 5) Modify / Rename / Comment
 ### 5.1 Rename volume
 - `volume rename -vserver <SVM> -volume <OLD_VOL> -newname <NEW_VOL>`
@@ -81,11 +106,12 @@
 
 ### 5.3 Space guarantee (thin vs thick)
 - `volume show   -vserver <SVM> -volume <VOL> -fields space-guarantee`
-- `volume modify -vserver <SVM> -volume <VOL> -space-guarantee none`     🪶 thin
-- `volume modify -vserver <SVM> -volume <VOL> -space-guarantee volume`   🧱 thick
+- `volume modify -vserver <SVM> -volume <VOL> -space-guarantee none`      🪶 thin
+- `volume modify -vserver <SVM> -volume <VOL> -space-guarantee volume`    🧱 thick
 
 ---
 
+<a id="resize"></a>
 ## 📏 6) Resize (Grow/Shrink) + Autosize
 ### 6.1 Resize
 - `volume show -vserver <SVM> -volume <VOL> -fields size,used,available,percent-used`
@@ -106,6 +132,7 @@ Disable:
 
 ---
 
+<a id="efficiency"></a>
 ## 🗜️ 7) Efficiency (Dedup/Compression/Compaction)
 Show:
 - `volume efficiency show -vserver <SVM> -volume <VOL>`
@@ -126,6 +153,7 @@ Policy (if you use them):
 
 ---
 
+<a id="snapshots"></a>
 ## 📸 8) Snapshots (volume snapshot operations)
 ### 8.1 Show / create / delete
 - `volume snapshot show   -vserver <SVM> -volume <VOL>`
@@ -142,12 +170,13 @@ Policy (if you use them):
 ### 8.4 Snapshot policy (still volume-scoped)
 - `volume snapshot policy show -vserver <SVM>`
 - `volume snapshot policy create -vserver <SVM> -policy <POLICY> -enabled true`
-- `volume snapshot policy add-schedule    -vserver <SVM> -policy <POLICY> -schedule hourly -count 24`
+- `volume snapshot policy add-schedule     -vserver <SVM> -policy <POLICY> -schedule hourly -count 24`
 - `volume snapshot policy remove-schedule -vserver <SVM> -policy <POLICY> -schedule hourly`
 - `volume modify -vserver <SVM> -volume <VOL> -snapshot-policy <POLICY>`
 
 ---
 
+<a id="flexclone"></a>
 ## 🧬 9) FlexClone (Volume Clones)
 ### 9.1 Create clone (from snapshot)
 - `volume snapshot show -vserver <SVM> -volume <VOL>`
@@ -166,6 +195,7 @@ Show clones:
 
 ---
 
+<a id="volume-move"></a>
 ## 🚚 10) Volume Move (between aggregates)
 Show status:
 - `volume move show`
@@ -181,6 +211,7 @@ Control:
 
 ---
 
+<a id="encryption"></a>
 ## 🔐 11) Volume Encryption (if supported)
 Create encrypted volume:
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -encrypt true`
@@ -198,6 +229,7 @@ Rekey:
 
 ---
 
+<a id="tiering"></a>
 ## ☁️ 12) Volume Tiering (FabricPool volume settings)
 Show tiering fields:
 - `volume show -vserver <SVM> -volume <VOL> -fields tiering-policy,tiering-minimum-cooling-days,cloud-retrieval-policy`
@@ -212,6 +244,7 @@ Set cooling days:
 
 ---
 
+<a id="qtrees"></a>
 ## 🌲 13) Qtrees (volume qtree)
 Create qtree:
 - `volume qtree create -vserver <SVM> -volume <VOL> -qtree <QTREE> -security-style unix`
@@ -227,6 +260,7 @@ Rename:
 
 ---
 
+<a id="quotas"></a>
 ## 🧾 14) Quotas (volume quota)
 > ✅ This section **creates a new quota policy** (not using `default`), adds rules to it, assigns it to the volume, then compiles quotas.
 
@@ -261,7 +295,7 @@ Show quota status:
 - `volume quota show -vserver <SVM> -volume <VOL>`
 
 Enable quotas (first time compilation) — *Use -foreground to wait for completion*:
-- `volume quota on     -vserver <SVM> -volume <VOL> -foreground`
+- `volume quota on      -vserver <SVM> -volume <VOL> -foreground`
 
 If quotas were already on and you changed rules/policy:
 - `volume quota resize -vserver <SVM> -volume <VOL> -foreground`
@@ -289,6 +323,7 @@ Disable quotas:
 
 ---
 
+<a id="delete-recovery"></a>
 ## 🗑️ 15) Delete + Recovery Queue (safer deletes)
 ### 15.1 Standard delete flow
 - `volume unmount -vserver <SVM> -volume <VOL>`   (if NAS mounted)
@@ -307,6 +342,7 @@ Purge permanently ☠️:
 
 ---
 
+<a id="power-oneliners"></a>
 ## 🧠 16) “Power” One-Liners (volume-only)
 - `volume show -vserver <SVM> -fields volume,aggregate,state,size,used,available,percent-used,junction-path,space-guarantee,is-encrypted,quota-policy`
 - `volume show-space -vserver <SVM> -volume <VOL>`
