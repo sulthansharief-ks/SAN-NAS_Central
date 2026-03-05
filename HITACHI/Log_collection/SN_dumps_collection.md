@@ -1,5 +1,5 @@
 # 🗄️ Standard Operating Procedure: Hitachi System Dump Collection
-
+https://www.teimouri.net/how-complete-alerts-hitachi-storage-navigator-vsp-g-series/
 When opening a Service Request (SR) with Hitachi Vantara Support for hardware failures, performance issues, or configuration bugs on a VSP array, engineering will almost always ask for a **"System Dump"** (or simply, a "Dump").
 
 Here is exactly what they need and how to securely collect it. 🚀
