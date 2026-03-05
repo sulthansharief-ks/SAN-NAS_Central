@@ -2,13 +2,26 @@
 **System:** Hitachi VSP G-Series / F-Series / G1000 / G1500  
 **Management Tool:** Hitachi Storage Navigator (Device Manager - Storage Navigator)  
 
+## 📑 Table of Contents
+1. [1. Purpose 🎯](#purpose)
+2. [2. Prerequisites 📋](#prerequisites)
+3. [3. Procedure 🛠️](#procedure)
+   * [Step 1: System Access 🌐](#step-1)
+   * [Step 2: Performance Verification (IOPS Check) 📉](#step-2)
+   * [Step 3: Remove LUN Paths (Unmapping) 🔗](#step-3)
+   * [Step 4: Delete Host Group (Optional) ✖️](#step-4)
+   * [Step 5: Reclaim or Delete LDEVs ♻️](#step-5)
+4. [4. Verification ✅](#verification)
+
 ---
 
+<a id="purpose"></a>
 ## **1. Purpose 🎯**
 This SOP provides the standardized steps to safely remove **LUN paths** and decommission **Host Groups** when a server is being retired. This ensures that storage resources are reclaimed and the system configuration remains clean.
 
 ---
 
+<a id="prerequisites"></a>
 ## **2. Prerequisites 📋**
 * **Host-Side Preparation**: The server must be powered down or the disks must be taken offline and unmounted from the OS to prevent I/O errors.
 * **Data Verification**: Ensure all required data has been migrated or backed up; once unmapped, the host loses all access immediately.
@@ -16,12 +29,15 @@ This SOP provides the standardized steps to safely remove **LUN paths** and deco
 
 ---
 
+<a id="procedure"></a>
 ## **3. Procedure 🛠️**
 
+<a id="step-1"></a>
 ### **Step 1: System Access 🌐**
 * Log in to the **Hitachi Storage Navigator** via the SVP IP address.
 * Ensure you are viewing the correct storage system serial number on the homepage.
 
+<a id="step-2"></a>
 ### **Step 2: Performance Verification (IOPS Check) 📉**
 *Before unmapping, you must confirm the IOPS graph is flat to avoid cutting off a live production service.*
 * In the left-hand explorer panel, navigate to **Analytics** or **Performance Monitor**.
@@ -30,6 +46,7 @@ This SOP provides the standardized steps to safely remove **LUN paths** and deco
 * Select the **I/O Rate (IOPS)** metric and view the real-time or historical graph.
 * **Verification:** Confirm that the IOPS for these LDEVs is **0** or shows a consistently **flat line**. If activity is detected, stop the procedure and identify the active host.
 
+<a id="step-3"></a>
 ### **Step 3: Remove LUN Paths (Unmapping) 🔗**
 * Navigate to **Ports / Host Groups / iSCSI Targets** in the left explorer panel.
 * Select the specific **Host Group** associated with the decommissioned server.
@@ -37,11 +54,13 @@ This SOP provides the standardized steps to safely remove **LUN paths** and deco
 * Select the LUNs intended for removal and click the **Remove LUN Paths** button.
 * **Final Review**: Confirm the list of LUNs to ensure no production volumes are included, then click **Finish** followed by **Apply**.
 
+<a id="step-4"></a>
 ### **Step 4: Delete Host Group (Optional) ✖️**
 * Return to the **Host Group** list after the LUN paths are successfully removed.
 * If the server is being permanently retired, select the empty **Host Group**.
 * Click **Delete Host Group** to clear WWN registrations from the storage ports.
 
+<a id="step-5"></a>
 ### **Step 5: Reclaim or Delete LDEVs ♻️**
 * Navigate to the **Logical Devices** or **Pools** section.
 * Locate the **LDEV IDs** that were just unmapped.
@@ -49,10 +68,10 @@ This SOP provides the standardized steps to safely remove **LUN paths** and deco
 
 ---
 
+<a id="verification"></a>
 ## **4. Verification ✅**
 * Open the **Tasks** window to monitor job progress.
 * Confirm the "Remove LUN Paths" and "Delete Host Group" tasks reach a **Completed** status.
 * Verify the **Pools** summary to see that unallocated capacity has increased.
 
 ---
-
