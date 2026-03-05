@@ -2,8 +2,17 @@
 
 This document provides a comprehensive checklist and command set for performing health checks on NetApp ONTAP clusters. It covers system health, high availability, storage, networking, and logs.
 
+## 📑 Table of Contents
+1. [📋 1. Cluster & System General Health](#cluster-health)
+2. [⚡ 2. High Availability (HA) & Failover](#ha-failover)
+3. [💾 3. Storage Health (Aggregates & Disks)](#storage-health)
+4. [🌐 4. Network & Connectivity](#network-connectivity)
+5. [📝 5. Events, Logs & AutoSupport](#events-logs)
+6. [⚡ Quick Reference: The "Morning Coffee" One-Liner](#quick-reference)
+
 ---
 
+<a id="cluster-health"></a>
 ## 📋 1. Cluster & System General Health
 *Check the heartbeat of the system to ensure all nodes are online and eligible.*
 
@@ -26,6 +35,7 @@ system node show -fields uptime, model, version
 
 ---
 
+<a id="ha-failover"></a>
 ## ⚡ 2. High Availability (HA) & Failover
 *Critical checks to ensure the cluster can survive a controller failure.*
 
@@ -45,6 +55,7 @@ storage disk show -container-type unassigned
 
 ---
 
+<a id="storage-health"></a>
 ## 💾 3. Storage Health (Aggregates & Disks)
 *Ensure physical media is healthy and logical containers have space.*
 
@@ -67,6 +78,7 @@ storage shelf show -connectivity
 
 ---
 
+<a id="network-connectivity"></a>
 ## 🌐 4. Network & Connectivity
 *Verify that data paths (LIFs) and physical ports are stable.*
 
@@ -90,6 +102,7 @@ network interface failover-groups show
 
 ---
 
+<a id="events-logs"></a>
 ## 📝 5. Events, Logs & AutoSupport
 *Review historical data for intermittent issues.*
 
@@ -106,6 +119,7 @@ system health alert show -subsystem Environment
 
 ---
 
+<a id="quick-reference"></a>
 ## ⚡ Quick Reference: The "Morning Coffee" One-Liner
 *Run this single command string to check the pulse of the cluster in 5 seconds.*
 
