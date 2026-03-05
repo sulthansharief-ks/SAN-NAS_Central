@@ -3,13 +3,13 @@
 > 🏷️ Replace placeholders like `<SVM> <AGGR> <IPSPACE> <DOMAIN> <DNS1> ...`
 
 ## 📑 Table of Contents
-1. [🧰 0) Quick CLI Helpers](#🧰-0-quick-cli-helpers)
-2. [🆕 1) Create an SVM (vserver) — from scratch](#🆕-1-create-an-svm-vserver-from-scratch)
-3. [👀 2) Show / Inventory / Inspect](#👀-2-show--inventory--inspect)
-4. [🟢🔴 3) Start / Stop SVM (admin state)](#🟢🔴-3-start--stop-svm-admin-state)
-5. [✍️ 4) Modify / Rename / Delete SVM](#✍️-4-modify--rename--delete-svm)
-6. [🌐 5) Name Services (DNS / LDAP / NIS / ns-switch)](#🌐-5-name-services-dns--ldap--nis--ns-switch)
-7. [✅ Mini Tips](#✅-mini-tips)
+1. [🧰 0) Quick CLI Helpers](#quick-cli)
+2. [🆕 1) Create an SVM (vserver) — from scratch](#create-svm)
+3. [👀 2) Show / Inventory / Inspect](#show-inventory)
+4. [🟢🔴 3) Start / Stop SVM (admin state)](#start-stop)
+5. [✍️ 4) Modify / Rename / Delete SVM](#modify-delete)
+6. [🌐 5) Name Services (DNS / LDAP / NIS / ns-switch)](#name-services)
+7. [✅ Mini Tips](#mini-tips)
 
 ---
 
@@ -112,6 +112,7 @@ VOL2  -->|Hosted on| AG2
 
 ---
 
+<a id="quick-cli"></a>
 ## 🧰 0) Quick CLI Helpers
 - `man vserver`
 - `man vserver create`
@@ -122,6 +123,7 @@ VOL2  -->|Hosted on| AG2
 
 ---
 
+<a id="create-svm"></a>
 ## 🆕 1) Create an SVM (vserver) — from scratch
 
 ### 1.1 Basic SVM create (explicit root volume + aggregate)
@@ -142,6 +144,7 @@ VOL2  -->|Hosted on| AG2
 
 ---
 
+<a id="show-inventory"></a>
 ## 👀 2) Show / Inventory / Inspect
 
 ### 2.1 List SVMs
@@ -161,6 +164,7 @@ VOL2  -->|Hosted on| AG2
 
 ---
 
+<a id="start-stop"></a>
 ## 🟢🔴 3) Start / Stop SVM (admin state)
 
 ### 3.1 Start / Stop
@@ -173,6 +177,7 @@ VOL2  -->|Hosted on| AG2
 
 ---
 
+<a id="modify-delete"></a>
 ## ✍️ 4) Modify / Rename / Delete SVM
 
 ### 4.1 Common modifies
@@ -205,6 +210,7 @@ VOL2  -->|Hosted on| AG2
 
 ---
 
+<a id="name-services"></a>
 ## 🌐 5) Name Services (DNS / LDAP / NIS / ns-switch)
 
 ### 5.1 DNS (create / show / modify / delete / check)
@@ -284,6 +290,7 @@ Create / Modify (examples):
 
 ---
 
+<a id="mini-tips"></a>
 ## ✅ Mini Tips
 - 🧭 Always verify on your cluster: `man <command>` / `<command> ?` (options vary a bit across 9.x).
 - ⚠️ Protocol changes can disrupt client access—use `vserver show-protocols` before/after.
