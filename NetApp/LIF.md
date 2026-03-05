@@ -1,6 +1,8 @@
 # 🌐 NetApp ONTAP (9.x) — LIF Operations (Scratch ➜ Advanced) 🚀
 > ✅ **Rule:** This cheat-sheet sticks to **interface-scoped commands** (mostly `network interface ...`).
 > 🏷️ Replace placeholders like `<SVM> <LIF> <NODE> <PORT> <IP>` etc.
+>
+> For LIF Creation : https://docs.netapp.com/us-en/ontap/smb-config/create-lif-task.html
 
 ```mermaid
 graph TD
