@@ -4,7 +4,18 @@
 Security 101 says "Least Privilege." If a junior admin only needs to check volume space, they shouldn't have the power to delete the entire cluster. 
 
 This guide walks you through creating custom Roles, Users, and locking down your NetApp cluster like a fortress.
-<!--![NetApp RBAC Schematic Diagram](/media/Gemini_Generated_Image_b7wmpdb7wmpdb7wm.png)-->
+
+## 📑 Table of Contents
+1. [🧠 1. The Core Concepts](#core-concepts)
+2. [🛠️ 2. Creating a Custom Role](#custom-role)
+3. [👤 3. Creating the User & Assigning the Role](#create-user)
+4. [🔑 4. Setting the Password](#set-password)
+5. [🕵️‍♂️ 5. Verification: Did it work?](#verification)
+6. [🚀 6. Advanced: Restricting access to a specific SVM](#advanced-svm)
+7. [🧹 7. Cleanup](#cleanup)
+8. [🛡️ Example: The "Builder" Role (Create All, Delete Nothing)](#builder-role)
+
+---
 
 ```mermaid
 graph TD
@@ -67,8 +78,10 @@ graph TD
     %% Specific Path (Solid Red Glow)
     linkStyle 4 stroke:#ff3333,stroke-width:5px
 ```
+
 ---
 
+<a id="core-concepts"></a>
 ## 🧠 1. The Core Concepts
 *Before we type, let's understand the hierarchy.*
 
@@ -79,6 +92,7 @@ graph TD
 
 ---
 
+<a id="custom-role"></a>
 ## 🛠️ 2. Creating a Custom Role
 *Let's create a role called "Level1_Support" that can view everything but touch nothing.*
 
@@ -101,6 +115,7 @@ security login role create -role Level1_Support -cmddir "volume delete" -access 
 
 ---
 
+<a id="create-user"></a>
 ## 👤 3. Creating the User & Assigning the Role
 *Now that the hat (Role) is made, let's put it on a head (User).*
 
@@ -117,6 +132,7 @@ security login unlock -username junior_admin
 
 ---
 
+<a id="set-password"></a>
 ## 🔑 4. Setting the Password
 *The user is created, but they need a secret handshake.*
 
@@ -127,6 +143,7 @@ security login password -username junior_admin
 
 ---
 
+<a id="verification"></a>
 ## 🕵️‍♂️ 5. Verification: Did it work?
 *Check your work before you hand over the credentials.*
 
@@ -143,6 +160,7 @@ security login role show -role Level1_Support
 
 ---
 
+<a id="advanced-svm"></a>
 ## 🚀 6. Advanced: Restricting access to a specific SVM
 *Sometimes you want a tenant admin to manage THEIR data (SVM) but not the whole cluster.*
 
@@ -158,6 +176,7 @@ security login create -vserver <SVM_Name> -user-or-group-name tenant_admin -appl
 
 ---
 
+<a id="cleanup"></a>
 ## 🧹 7. Cleanup
 *Made a mistake? Here is how to delete the evidence.*
 
@@ -171,20 +190,15 @@ security login role delete -role Level1_Support
 
 ---
 
-
-
+<a id="builder-role"></a>
 # 🛡️ Just as an example NetApp RBAC: The "Builder" Role (Create All, Delete Nothing) 🏗️
 
 This configuration creates a role that allows an admin to configure storage, networking, and SVMs ("Create Everything") but prevents them from destroying data or configurations ("Delete Nothing").
-
----
 
 ## 📜 1. The Strategy
 ONTAP processes permissions from **Specific** to **Generic**. 
 1. First, we grant `access all` to the entire system (`DEFAULT`).
 2. Then, we apply `access none` to specific `delete` command paths.
-
----
 
 ## 🛠️ 2. The Configuration Script
 *Run these commands in your ONTAP CLI.*
@@ -218,4 +232,5 @@ security login role create -role Builder_NoDelete -cmddir "system node reboot" -
 # 🔐 SECURITY (Prevent them from deleting other admins!)
 security login role create -role Builder_NoDelete -cmddir "security login delete" -access none
 ```
-*Sulthan Sharief K S*
+
+*--Sulthan Sharief K S*
