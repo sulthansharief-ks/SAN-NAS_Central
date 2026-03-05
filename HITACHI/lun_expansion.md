@@ -2,13 +2,26 @@
 **System:** Hitachi VSP G-Series / F-Series / G1000 / G1500  
 **Management Tool:** Hitachi Storage Navigator (Device Manager - Storage Navigator)  
 
+## 📑 Table of Contents
+1. [1. Purpose 🎯](#purpose)
+2. [2. Prerequisites 📋](#prerequisites)
+3. [3. Procedure 🛠️](#procedure)
+   * [Step 1: System Access 🌐](#step-1)
+   * [Step 2: Locate the Target LDEV 💾](#step-2)
+   * [Step 3: Perform V-VOL Expansion 🚀](#step-3)
+   * [Step 4: Confirm and Apply ✅](#step-4)
+4. [4. Host-Side Finalization 🏁](#host-side)
+5. [5. Safety Warnings ⚠️](#safety-warnings)
+
 ---
 
+<a id="purpose"></a>
 ## **1. Purpose 🎯**
 This SOP defines the process for increasing the capacity of an existing **Virtual Volume (V-VOL)** while the host remains online. This allows for seamless storage growth without requiring the creation of new LUNs or the migration of data.
 
 ---
 
+<a id="prerequisites"></a>
 ## **2. Prerequisites 📋**
 * **Dynamic Provisioning**: The target LDEV must be a Virtual Volume (V-VOL) associated with a **Dynamic Provisioning Pool**.
 * **Pool Capacity**: Ensure the target Storage Pool has sufficient physical free space to accommodate the expanded size.
@@ -17,19 +30,25 @@ This SOP defines the process for increasing the capacity of an existing **Virtua
 
 ---
 
+<a id="procedure"></a>
 ## **3. Procedure 🛠️**
 
 ![v-vol_operations](/HITACHI/media/hitachi_vols.png)
 
+
+
+<a id="step-1"></a>
 ### **Step 1: System Access 🌐**
 * Log in to **Hitachi Storage Navigator** via the SVP IP address.
 * Select the correct **Storage System** from the left-hand explorer tree.
 
+<a id="step-2"></a>
 ### **Step 2: Locate the Target LDEV 💾**
 * Navigate to the **Storage Systems** tab > **Logical Devices**.
 * Use the **Filter** tool to search for the specific **LDEV ID** or **LDEV Name** that requires expansion.
 * Verify the current capacity and the Pool ID it is associated with.
 
+<a id="step-3"></a>
 ### **Step 3: Perform V-VOL Expansion 🚀**
 * Select the checkbox for the target **LDEV**.
 * Click **More Actions** (or right-click) and select **Expand V-VOL Capacity**.
@@ -38,6 +57,7 @@ This SOP defines the process for increasing the capacity of an existing **Virtua
     * **Increased Capacity**: Enter the **total final size** or the amount to be added (ensure units like GB/TB are correctly selected).
 * Click **Finish** to move to the confirmation screen.
 
+<a id="step-4"></a>
 ### **Step 4: Confirm and Apply ✅**
 * Review the **Task Name** and the list of LDEVs to be expanded.
 * Click **Apply** to submit the task to the storage controllers.
@@ -45,6 +65,7 @@ This SOP defines the process for increasing the capacity of an existing **Virtua
 
 ---
 
+<a id="host-side"></a>
 ## **4. Host-Side Finalization 🏁**
 *Once the storage task is complete, the host must be notified of the new capacity:*
 
@@ -54,9 +75,9 @@ This SOP defines the process for increasing the capacity of an existing **Virtua
 
 ---
 
+<a id="safety-warnings"></a>
 ## **5. Safety Warnings ⚠️**
 * **Do Not Shrink**: Capacity expansion is a one-way operation. Hitachi V-VOLs cannot be shrunk once expanded.
 * **Meta-Resource Restrictions**: Ensure the LDEV is not reserved by a specialized meta-resource group that prohibits configuration changes.
 
 ---
-
