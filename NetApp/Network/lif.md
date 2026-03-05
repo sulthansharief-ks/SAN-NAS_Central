@@ -2,6 +2,22 @@
 > ✅ **Rule:** This cheat-sheet sticks to **interface-scoped commands** (mostly `network interface ...`).
 > 🏷️ Replace placeholders like `<SVM> <LIF> <NODE> <PORT> <IP>` etc.
 
+## 📑 Table of Contents
+1. [🧰 0) Quick CLI Helpers (Exceptions to the rule)](#section-0)
+2. [🆕 1) Create a LIF (from scratch)](#section-1)
+3. [👀 2) Show / Inventory / Inspect](#section-2)
+4. [🟢🔴 3) State Operations (Up/Down)](#section-3)
+5. [🔁 4) Migration & Revert (Moving LIFs)](#section-4)
+6. [✍️ 5) Modify Attributes (IPs, Home Ports)](#section-5)
+7. [🛡️ 6) Failover Groups & Policies](#section-6)
+8. [🚦 7) Service Policies (ONTAP 9.10+)](#section-7)
+9. [🕸️ 8) Subnets (Automated IP Assignment)](#section-8)
+10. [🔎 9) Diagnostics & Reachability](#section-9)
+11. [🗑️ 10) Delete & Cleanup](#section-10)
+12. [🧠 11) "Power" One-Liners (LIF-only)](#section-11)
+
+---
+
 ```mermaid
 graph TD
     %% --- Dark Mode Theme Definitions ---
@@ -53,8 +69,9 @@ graph TD
     linkStyle 2 stroke:#ff0055,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
-    
+---
 
+<a id="section-0"></a>
 ## 🧰 0) Quick CLI Helpers (Exceptions to the rule)
 - `man network interface`
 - `network interface ?`
@@ -62,15 +79,15 @@ graph TD
 - `network port show` 🔌 *(Check physical ports first)*
 - `network port show -node <NODE> -type physical`
 
+---
 
-
-
+<a id="section-1"></a>
 ## 🆕 1) Create a LIF (from scratch)
 ### 1.1 Basic Data LIF (NAS/SAN)
 > *Modern ONTAP uses `-service-policy` instead of `-role`.*
 - `network interface create -vserver <SVM> -lif <LIF> -service-policy default-data-files -home-node <NODE> -home-port <PORT> -address <IP> -netmask <MASK>`
 
-  Example:
+  **Example:**
 -  `network interface create -vserver vs1.example.com -lif datalif1 -role data -data-protocol cifs -home-node node-4 -home-port e1c -address 192.0.2.145 -netmask 255.255.255.0 -firewall-policy data -auto-revert true`
 
 ### 1.2 Cluster Management LIF
@@ -85,6 +102,7 @@ graph TD
 
 ---
 
+<a id="section-2"></a>
 ## 👀 2) Show / Inventory / Inspect
 ### 2.1 List LIFs
 - `network interface show`
@@ -103,12 +121,14 @@ graph TD
 
 ---
 
+<a id="section-3"></a>
 ## 🟢🔴 3) State Operations (Up/Down)
 - `network interface modify -vserver <SVM> -lif <LIF> -status-admin up`
 - `network interface modify -vserver <SVM> -lif <LIF> -status-admin down`
 
 ---
 
+<a id="section-4"></a>
 ## 🔁 4) Migration & Revert (Moving LIFs)
 > ⚠️ **Note:** Moving a LIF keeps the IP active but changes the physical path.
 
@@ -126,6 +146,7 @@ graph TD
 
 ---
 
+<a id="section-5"></a>
 ## ✍️ 5) Modify Attributes (IPs, Home Ports)
 ### 5.1 Change IP Address
 - `network interface modify -vserver <SVM> -lif <LIF> -address <NEW_IP> -netmask <NEW_MASK>`
@@ -138,6 +159,7 @@ graph TD
 
 ---
 
+<a id="section-6"></a>
 ## 🛡️ 6) Failover Groups & Policies
 ### 6.1 Show Failover status
 - `network interface show -vserver <SVM> -lif <LIF> -failover`
@@ -152,6 +174,7 @@ graph TD
 
 ---
 
+<a id="section-7"></a>
 ## 🚦 7) Service Policies (ONTAP 9.10+)
 > 💡 Replaces the old `-role` and `-firewall-policy` commands. Controls strictly what traffic (SSH, NFS, CIFS, DNS) flows through a LIF.
 
@@ -170,6 +193,7 @@ graph TD
 
 ---
 
+<a id="section-8"></a>
 ## 🕸️ 8) Subnets (Automated IP Assignment)
 ### 8.1 Create Subnet
 - `network subnet create -subnet-name <SUBNET> -broadcast-domain <BD> -subnet <10.0.0.0/24> -gateway <10.0.0.1> -ip-ranges <10.0.0.50-10.0.0.100>`
@@ -179,6 +203,7 @@ graph TD
 
 ---
 
+<a id="section-9"></a>
 ## 🔎 9) Diagnostics & Reachability
 ### 9.1 Ping from LIF
 - `network ping -lif <LIF> -vserver <SVM> -destination <REMOTE_IP>`
@@ -192,6 +217,7 @@ graph TD
 
 ---
 
+<a id="section-10"></a>
 ## 🗑️ 10) Delete & Cleanup
 ### 10.1 Standard Delete
 1. **Down the LIF:**
@@ -201,6 +227,7 @@ graph TD
 
 ---
 
+<a id="section-11"></a>
 ## 🧠 11) "Power" One-Liners (LIF-only)
 - `network interface show -fields lif,address,netmask,home-node,home-port,curr-node,curr-port,is-home,status-admin,status-oper`
 - `network interface show -is-home false`
