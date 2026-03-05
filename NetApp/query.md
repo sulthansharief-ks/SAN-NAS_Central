@@ -12,5 +12,8 @@ vol show -vserver <nfs_vserver>
 vserver show -vserver <nfs_vserver>
 check export policy permission of an volume/qtree and check for root vol permission, check if root vol and nfs vol is using the same export policy
 
+LIF
+check if lifs are created using -data-protocols -role or using service policy
+
 
 
