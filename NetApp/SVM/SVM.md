@@ -2,6 +2,16 @@
 > ✅ **Rule:** This cheat-sheet sticks to **SVM/vserver-scoped CLI commands** (commands that start with `vserver ...`).
 > 🏷️ Replace placeholders like `<SVM> <AGGR> <IPSPACE> <DOMAIN> <DNS1> ...`
 
+## 📑 Table of Contents
+1. [🧰 0) Quick CLI Helpers](#🧰-0-quick-cli-helpers)
+2. [🆕 1) Create an SVM (vserver) — from scratch](#🆕-1-create-an-svm-vserver-from-scratch)
+3. [👀 2) Show / Inventory / Inspect](#👀-2-show--inventory--inspect)
+4. [🟢🔴 3) Start / Stop SVM (admin state)](#🟢🔴-3-start--stop-svm-admin-state)
+5. [✍️ 4) Modify / Rename / Delete SVM](#✍️-4-modify--rename--delete-svm)
+6. [🌐 5) Name Services (DNS / LDAP / NIS / ns-switch)](#🌐-5-name-services-dns--ldap--nis--ns-switch)
+7. [✅ Mini Tips](#✅-mini-tips)
+
+---
 
 ```mermaid
 
@@ -99,6 +109,7 @@ VOL1  -->|Hosted on| AG1
 VOL2  -->|Hosted on| AG2
 
 ```
+
 ---
 
 ## 🧰 0) Quick CLI Helpers
@@ -107,7 +118,7 @@ VOL2  -->|Hosted on| AG2
 - `vserver ?`
 - `vserver create ?`
 - `set -privilege advanced`  ⚙️
-- `set -privilege admin`     ✅
+- `set -privilege admin`    ✅
 
 ---
 
@@ -270,10 +281,6 @@ Create / Modify (examples):
 
 - `vserver services name-service ns-switch modify -vserver <SVM> -database passwd -sources files,ldap`
 - `vserver services name-service ns-switch modify -vserver <SVM> -database hosts  -sources files,dns`
-
----
-
-
 
 ---
 
