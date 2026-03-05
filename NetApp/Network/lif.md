@@ -70,6 +70,9 @@ graph TD
 > *Modern ONTAP uses `-service-policy` instead of `-role`.*
 - `network interface create -vserver <SVM> -lif <LIF> -service-policy default-data-files -home-node <NODE> -home-port <PORT> -address <IP> -netmask <MASK>`
 
+  Example:
+-  `network interface create -vserver vs1.example.com -lif datalif1 -role data -data-protocol cifs -home-node node-4 -home-port e1c -address 192.0.2.145 -netmask 255.255.255.0 -firewall-policy data -auto-revert true`
+
 ### 1.2 Cluster Management LIF
 - `network interface create -vserver <CLUSTER_SVM> -lif <LIF> -service-policy default-management -home-node <NODE> -home-port <PORT> -address <IP> -netmask <MASK>`
 
