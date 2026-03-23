@@ -1,9 +1,10 @@
+
 # 🏗️ NetApp ONTAP: The Definitive Aggregate Guide 🚀
 
 This guide covers the entire lifecycle of a NetApp Aggregate: from identifying spare disks and calculating RAID groups to creation, daily maintenance, and safe decommissioning.
 ## The Aggregate provides the physical storage blocks, and WAFL manages the logical organization of those blocks.
 
-<!-- ![Aggregate Architecture](/media/Gemini_Generated_Image_xzc9ybxzc9ybxzc9.png) -->
+
 
 ```mermaid
 graph LR
@@ -76,15 +77,16 @@ graph LR
 ---
 
 ## 📋 Table of Contents
-1. [Phase 1: Preparation & Planning](#phase-1-preparation--planning)
-2. [Phase 2: Creating the Aggregate](#phase-2-creating-the-aggregate)
-3. [Phase 3: Verification & Health Checks](#phase-3-verification--health-checks)
-4. [Phase 4: Expansion (Adding Disks)](#phase-4-expansion-adding-disks)
-5. [Phase 5: Maintenance & Operations](#phase-5-maintenance--operations)
-6. [Phase 6: Safe Deletion](#phase-6-safe-deletion)
+1. [Phase 1: Preparation & Planning](#phase-1)
+2. [Phase 2: Creating the Aggregate](#phase-2)
+3. [Phase 3: Verification & Health Checks](#phase-3)
+4. [Phase 4: Expansion (Adding Disks)](#phase-4)
+5. [Phase 5: Maintenance & Operations](#phase-5)
+6. [Phase 6: Safe Deletion](#phase-6)
 
 ---
 
+<a id="phase-1"></a>
 ## 🧐 Phase 1: Preparation & Planning
 *Before building, you must identify your available resources (bricks).*
 
@@ -114,6 +116,7 @@ storage aggregate create -aggregate aggr_test -diskcount 20 -simulate
 
 ---
 
+<a id="phase-2"></a>
 ## 🔨 Phase 2: Creating the Aggregate
 *Constructing the storage pool. Choose the method that fits your requirements.*
 
@@ -146,6 +149,7 @@ storage aggregate create -aggregate aggr3_mirrored -diskcount 20 -mirror true
 
 ---
 
+<a id="phase-3"></a>
 ## 👀 Phase 3: Verification & Health Checks
 *Inspect the foundation immediately after building.*
 
@@ -164,6 +168,7 @@ storage aggregate show-space
 
 ---
 
+<a id="phase-4"></a>
 ## 📈 Phase 4: Expansion (Adding Disks)
 *Running out of space? Add more disks to the pool.*
 
@@ -180,6 +185,7 @@ storage aggregate add-disks -aggregate aggr1_ssd -disklist 2.10.0,2.10.1
 
 ---
 
+<a id="phase-5"></a>
 ## 🔧 Phase 5: Maintenance & Operations
 *Day-to-day tasks to keep the aggregate healthy.*
 
@@ -216,6 +222,7 @@ storage aggregate show-space -percent-used >90
 
 ---
 
+<a id="phase-6"></a>
 ## 🧨 Phase 6: Safe Deletion
 *Decommissioning an aggregate. This is destructive and irreversible.*
 
