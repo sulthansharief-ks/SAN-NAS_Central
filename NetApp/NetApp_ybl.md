@@ -94,7 +94,7 @@ dns show
 
 ### 🤝 2.1 Join the Domain
 ```bash
-cifs server create -cifs-server Netappdemo -domain yesbank.com -ou CN=Computers -default-site ""
+cifs server create -vserver Demo -cifs-server Netappdemo -domain yesbank.com -ou CN=Computers -default-site ""
 ```
 > 🔑 **Heads Up!** ONTAP is going to ask for credentials. Have your `yesbank.com` Domain Administrator username and password ready to authenticate the join! 
 
