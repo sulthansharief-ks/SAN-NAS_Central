@@ -136,4 +136,3 @@ To ensure the primary site is protected again, resync the mirror back to its ori
 ```bash
 snapmirror resync -source-path YBALSVM039UPI:YBALVOL039UPI -destination-path YBBRSVM039UPI:YBALVOL039UPI
 ```
-
