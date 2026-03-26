@@ -1,22 +1,17 @@
+
 # 🔄 NetApp ONTAP: NFS Export Failover & Failback SOP 🛡️
 
 > 🏷️ **Context Variables Used in this SOP:**
 > * **Source SVM**
-> * **Source Volume** 
-> * **Destination (DR) SVM** 
+> * **Source Volume**
+> * **Destination (DR) SVM**
 > * **Destination (DR) Volume** 
-
----
 
 ## 📑 Table of Contents
 1. [🚨 Phase 1: Planned Failover (Primary to DR)](#phase-1)
 2. [⚙️ Phase 2: Quota & Namespace Initialization (DR Site)](#phase-2)
 3. [🔄 Phase 3: Failback Preparation (Reverse Resync)](#phase-3)
 4. [✅ Phase 4: Finalizing Failback (Restoring Primary)](#phase-4)
-
----
-
-
 
 ---
 
@@ -68,11 +63,14 @@ vol mount -vserver YBBRSVM039UPI -volume YBALVOL039UPI -junction-path /YBALVOL03
 ### 2.2 Create and Enable Quota Rules
 *Run on the Destination Cluster:*
 Apply the specific Qtree disk limits to prevent the volume from overfilling at the DR site.
-```bash
-# Create the quota policy rule
-quota policy rule create -vserver YBBRSVM039UPI -policy-name default -volume YBALVOL039UPI -type tree -target YBALQTR039UPI -disk-limit 100GB -soft-disk-limit 80GB -threshold 70GB
 
-# Turn the quota engine ON for the volume
+Create the quota policy rule:
+```bash
+quota policy rule create -vserver YBBRSVM039UPI -policy-name default -volume YBALVOL039UPI -type tree -target YBALQTR039UPI -disk-limit 100GB -soft-disk-limit 80GB -threshold 70GB
+```
+
+Turn the quota engine ON for the volume:
+```bash
 quota on -vserver YBBRSVM039UPI -volume YBALVOL039UPI
 ```
 *At this point, you instruct the network/application teams to update DNS or remount the NFS exports using the DR SVM's IP addresses.*
@@ -88,18 +86,19 @@ quota on -vserver YBBRSVM039UPI -volume YBALVOL039UPI
 This command overwrites the original source volume with the updated data from the DR site.
 
 **For Volume-Level SnapMirror:**
+Replace placeholders with your actual original source SVM/Vol and current DR SVM/Vol:
 ```bash
-# Replace placeholders with your actual original source SVM/Vol and current DR SVM/Vol
 snapmirror resync -source-path YBBRSVM039UPI:YBALVOL039UPI -destination-path YBALSVM039UPI:YBALVOL039UPI
 ```
 
 **For Vserver-Level (SVM-DR) SnapMirror:**
 *(If you are failing back an entire SVM at once, as shown in your second screenshot)*
+
+Example from your screenshot syntax:
 ```bash
-# Example from your screenshot syntax
 snapmirror resync -source-path <DR_SVM>: -destination-path YBALSVM019NGA01:
 ```
-At this moment DR volume is Live and replication is happening from (Destination-> Source)
+*At this moment DR volume is Live and replication is happening from (Destination -> Source)*
 
 ---
 
@@ -119,11 +118,15 @@ At this moment DR volume is Live and replication is happening from (Destination-
 
 ### 4.2 Break Reverse Mirror & Remount Primary
 *Run on the Original Source Cluster:*
+
+Quiesce and break the SnapMirror:
 ```bash
 snapmirror quiesce -destination-path YBALSVM039UPI:YBALVOL039UPI
 snapmirror break -destination-path YBALSVM039UPI:YBALVOL039UPI
+```
 
-# Remount the primary volume
+Remount the primary volume:
+```bash
 vol mount -vserver YBALSVM039UPI -volume YBALVOL039UPI -junction-path /YBALVOL039UPI
 ```
 
@@ -134,4 +137,3 @@ To ensure the primary site is protected again, resync the mirror back to its ori
 snapmirror resync -source-path YBALSVM039UPI:YBALVOL039UPI -destination-path YBBRSVM039UPI:YBALVOL039UPI
 ```
 
-Your environment is now completely failed back to the primary site, quotas are active, and DR replication is fully restored.
