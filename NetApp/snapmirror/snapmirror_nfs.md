@@ -1,14 +1,10 @@
 # 🔄 NetApp ONTAP: NFS Export Failover & Failback SOP 🛡️
 
-Based on the command outputs provided in your images, your environment utilizes **Volume-level SnapMirror** with manual quota management on the destination side, as well as some **Vserver-level (SVM-DR)** relationships. 
-
-This Standard Operating Procedure (SOP) is engineered for NetApp Managed Service Professionals. It maps exactly to your provided command structure while aligning with official NetApp ONTAP 9 disaster recovery best practices for NFS workloads.
-
 > 🏷️ **Context Variables Used in this SOP:**
-> * **Source SVM:** `YBALSVM039UPI`
-> * **Source Volume:** `YBALVOL039UPI`
-> * **Destination (DR) SVM:** `YBBRSVM039UPI`
-> * **Destination (DR) Volume:** `YBALVOL039UPI`
+> * **Source SVM**
+> * **Source Volume** 
+> * **Destination (DR) SVM** 
+> * **Destination (DR) Volume** 
 
 ---
 
@@ -20,30 +16,7 @@ This Standard Operating Procedure (SOP) is engineered for NetApp Managed Service
 
 ---
 
-```mermaid
-graph TD
-    %% --- Dark Mode Theme Definitions ---
-    classDef base fill:#0d1117,stroke:#30363d,stroke-width:2px,color:#fff
-    classDef source fill:#001e26,stroke:#00b8ff,stroke-width:3px,color:#fff
-    classDef dest fill:#2a1215,stroke:#f85149,stroke-width:3px,color:#fff
-    classDef action fill:#2d2a1b,stroke:#d29922,stroke-width:3px,color:#fff
 
-    Start((Start Failover)):::base
-
-    UNMOUNT["1. Unmount Source<br/>(Prevent Split-Brain)"]:::source
-    SYNC["2. Final Update<br/>Push last delta to DR"]:::action
-    BREAK["3. Quiesce & Break<br/>Make DR Volume R/W"]:::dest
-    MOUNT["4. Mount DR & Quotas<br/>Mount path and enable Quotas"]:::dest
-    RESYNC["5. Failback (Resync)<br/>Resync back to Primary"]:::action
-
-    Start --> UNMOUNT
-    UNMOUNT --> SYNC
-    SYNC --> BREAK
-    BREAK --> MOUNT
-    MOUNT --> RESYNC
-
-    linkStyle 0,1,2,3,4 stroke:#8b949e,stroke-width:2px
-```
 
 ---
 
@@ -126,6 +99,7 @@ snapmirror resync -source-path YBBRSVM039UPI:YBALVOL039UPI -destination-path YBA
 # Example from your screenshot syntax
 snapmirror resync -source-path <DR_SVM>: -destination-path YBALSVM019NGA01:
 ```
+At this moment DR volume is Live and replication is happening from (Destination-> Source)
 
 ---
 
