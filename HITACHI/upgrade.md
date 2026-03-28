@@ -1,4 +1,7 @@
 https://hackmd.io/@farmer87/hds_learning_01#Service-ProcessorSVP-%E7%A1%AC%E9%AB%94
+
+
+https://hackmd.io/@farmer87/hds_learning_02
 ---
 
 ## Phase 1: Pre-Requisites and Planning 📝
