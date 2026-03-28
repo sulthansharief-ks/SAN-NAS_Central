@@ -92,3 +92,6 @@ Regardless of which method you used above, you must save the changes and push th
 Ensure the zone is active and the new WWPN/Alias is now successfully zoned.
 
     zoneshow "Your_Zone_Name"
+
+
+Make sure edit the wwpn in storage array also
