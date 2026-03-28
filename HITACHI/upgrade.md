@@ -1,9 +1,4 @@
-Performing a microcode (firmware) upgrade on a Hitachi Virtual Storage Platform (VSP) is a critical procedure. ⚙️
-
-**Important Candor/Disclaimer:** ⚠️ For high-end enterprise arrays (like the VSP 5000 series or G1000/G1500), Hitachi **mandates** 🛑 that a certified Hitachi Customer Engineer (CE) performs the upgrade to maintain the 100% data availability guarantee. However, for mid-range and entry-level systems (like the VSP E-Series or G/F 350-900), Hitachi allows customer-driven Non-Disruptive Upgrades (NDU) via the Maintenance Utility. 🛠️
-
-Assuming you are working on a customer-upgradable array, here is the complete Standard Operating Procedure (SOP) 📋 for a Non-Disruptive Microcode Upgrade. 🚀
-
+https://hackmd.io/@farmer87/hds_learning_01#Service-ProcessorSVP-%E7%A1%AC%E9%AB%94
 ---
 
 ## Phase 1: Pre-Requisites and Planning 📝
