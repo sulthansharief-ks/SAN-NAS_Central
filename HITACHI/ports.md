@@ -62,4 +62,4 @@ When provisioning a new server on the G800, you must spread the LUN paths across
 
 ---
 
-**Would you like me to create an SOP detailing how to use the Hitachi `raidcom` CLI tool to rapidly query these ports and their associated Host Groups?**
+
