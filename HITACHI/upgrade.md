@@ -48,4 +48,3 @@ https://hackmd.io/@farmer87/hds_learning_02
 
 ---
 
-Would you like me to detail the specific Linux 🐧 and VMware CLI commands you should ask your server admins to run to verify their multipathing health before you initiate the controller failovers?
