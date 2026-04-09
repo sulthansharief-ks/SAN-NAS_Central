@@ -1,8 +1,8 @@
-
-
 # 🌐 NetApp ONTAP: Enterprise Networking & Troubleshooting Guide 🛠️
 
 Before diving into physical port troubleshooting, it is critical to understand how NetApp ONTAP structures its network stack. In enterprise environments, clients never connect directly to a raw physical port. Instead, they connect through a stacked architecture of LACP bundles, VLANs, and Logical Interfaces.
+
+When things break, troubleshooting shifts from a **Single Person (NetApp Admin)** isolating the storage side, to the **Whole Team (Storage, Network, and Data Center Admins)** coordinating to fix switches and physical cables.
 
 ---
 
@@ -110,12 +110,12 @@ graph TD
 
 | 🚨 Symptom / Command Output | 🎯 Likely Culprit | ⚖️ Responsibility / Domain | 🛠️ Next Step |
 | :--- | :--- | :--- | :--- |
-| **Admin: Down** / **Link: Down** | Port was manually disabled | 🔵 **NetApp** | Run `network port modify -up-admin true` |
-| **Admin: Up** / **Link: Down** | Dead Cable, SFP, or Switch Port is Shut | 🟡 **Media** / 🔴 **Switch** | Verify switch port status, swap cable/SFP |
-| **CRC Errors Incrementing** | Dirty fiber, bad SFP, failing switch hardware | 🟡 **Media** / 🔴 **Switch** | Clean fiber, replace SFP, test different switch port |
-| **Discarded Frames Incrementing** | MTU mismatch or VLAN tag mismatch | 🔴 **Switch** (Config) | Verify Switch MTU (Jumbo frames) and allowed VLANs |
-| **No LLDP/CDP Neighbors** | LLDP disabled on switch, or dead link | 🔴 **Switch** | Enable LLDP/CDP on switch, check physical link |
-| **Link Up, but LACP Ifgroup Down**| Switch port-channel suspended or misconfigured | 🔴 **Switch** (Config) | Set switch port-channel to LACP "Active" |
+| **Admin: Down** / **Link: Down** | Port was manually disabled | 🔵 **Storage Team** | Run `network port modify -up-admin true` |
+| **Admin: Up** / **Link: Down** | Dead Cable, SFP, or Switch Port is Shut | 🟡 **DC Tech** / 🔴 **Network Team** | Verify switch port status, swap cable/SFP |
+| **CRC Errors Incrementing** | Dirty fiber, bad SFP, failing switch hardware | 🟡 **DC Tech** / 🔴 **Network Team** | Clean fiber, replace SFP, test different switch port |
+| **Discarded Frames Incrementing** | MTU mismatch or VLAN tag mismatch | 🔴 **Network Team** | Verify Switch MTU (Jumbo frames) and allowed VLANs |
+| **No LLDP/CDP Neighbors** | LLDP disabled on switch, or dead link | 🔴 **Network Team** | Enable LLDP/CDP on switch, check physical link |
+| **Link Up, but LACP Ifgroup Down**| Switch port-channel suspended or misconfigured | 🔴 **Network Team** | Set switch port-channel to LACP "Active" |
 
 ---
 
@@ -130,9 +130,14 @@ network port show -node <node_name> -port <port_name>
 
 **How to Interpret the Output:**
 * **`Admin Status: up` / `Link Status: up`**: The port is perfectly healthy at Layer 1. If traffic is failing, it is a routing, VLAN, or LACP configuration issue.
-* **`Admin Status: down` / `Link Status: down`**: An administrator manually disabled the port. 
-  * *Fix:* Run `network port modify -node <node> -port <port> -up-admin true`
-* **`Admin Status: up` / `Link Status: down`**: **This is a physical Layer 1 failure.** The NetApp port is turned on, but it sees no light/electricity from the switch. The issue is a dead cable, dead SFP, or the switch port is shut down.
+
+> **🛠️ Action to Take (If Port is Down):**
+> * **If `Admin Status: down` / `Link Status: down` (Manually disabled):**
+>   * 👥 **Responsible Team:** **Storage Team**
+>   * **Fix:** Run `network port modify -node <node_name> -port <port_name> -up-admin true`
+> * **If `Admin Status: up` / `Link Status: down` (Layer 1 physical failure):**
+>   * 👥 **Responsible Team:** **Data Center Tech / Network Team**
+>   * **Fix:** The NetApp port is turned on, but it sees no light/electricity from the switch. The issue is a dead cable, dead SFP, or the switch port is shut down. Proceed to physical swap tests.
 
 ---
 
@@ -146,11 +151,13 @@ network port show -node <node_name> -port <port_name> -instance
 ```
 *(Scroll down in the output to the MAC/Hardware statistics section)*
 
-**Key Metrics to Investigate:**
-* **`CRC Errors` (Cyclic Redundancy Check):** If this counter is actively incrementing, you have a physical layer issue. 
-  * *Verdict:* The NetApp port is receiving corrupted frames. This is almost always a dirty fiber optic cable, a failing SFP transceiver, or a bad switch port. **It is rarely a NetApp hardware failure.**
-* **`Discarded Frames`**: The port is receiving traffic, but discarding it. 
-  * *Verdict:* This usually indicates a VLAN mismatch (the switch is sending tagged frames the NetApp doesn't expect) or an MTU (Jumbo Frames) mismatch between the switch and the NetApp.
+> **🛠️ Action to Take (Based on Error Counters):**
+> * **If `CRC Errors` are incrementing:**
+>   * 👥 **Responsible Team:** **Data Center Tech / Network Team**
+>   * **Fix:** The NetApp port is receiving corrupted frames. This is almost always a dirty fiber optic cable, a failing SFP transceiver, or a bad switch port. It is rarely a NetApp hardware failure. Clean the fiber or swap the SFP.
+> * **If `Discarded Frames` are incrementing:**
+>   * 👥 **Responsible Team:** **Network Team**
+>   * **Fix:** The port is receiving traffic, but dropping it. This usually indicates a VLAN mismatch (switch sending tagged frames NetApp doesn't expect) or an MTU/Jumbo Frames mismatch. Validate switch port configuration.
 
 ---
 
@@ -163,11 +170,13 @@ network port show -node <node_name> -port <port_name> -instance
 network device-discovery show -node <node_name> -port <port_name>
 ```
 
-**How to Interpret the Output:**
-* **If a switch name and port appear:** The physical link is healthy, and the cable is good. The NetApp is successfully receiving Layer 2 management frames from the switch. 
-  * *Verdict:* If data traffic is still failing, the issue is 100% a Switch configuration issue (wrong VLAN allowed on trunk, LACP suspended, etc.).
-* **If the table is empty:** The NetApp is not receiving discovery frames. 
-  * *Verdict:* Either LLDP/CDP is disabled on the switch, or the link/cable is dead.
+> **🛠️ Action to Take (Based on Discovery Output):**
+> * **If a switch name and port appear:**
+>   * 👥 **Responsible Team:** **Network Team**
+>   * **Fix:** The physical link is healthy, and the cable is good. If data traffic is still failing, the issue is 100% a Switch configuration issue (wrong VLAN allowed on trunk, routing issue).
+> * **If the table is empty:**
+>   * 👥 **Responsible Team:** **Network Team** (to check config) or **Data Center Tech** (to check cable)
+>   * **Fix:** Either LLDP/CDP is disabled on the upstream switch port, or the link/cable is completely dead.
 
 ---
 
@@ -180,10 +189,9 @@ network device-discovery show -node <node_name> -port <port_name>
 network port ifgrp show -node <node_name> -ifgrp <ifgrp_name> -instance
 ```
 
-**Key Metrics to Investigate:**
-* **`Up Ports` vs. `Down Ports`**: Shows which physical ports are actively participating in the bundle.
-* **`Port Participation` (Active/Active):** If a port shows as `participating: false`, it means the NetApp is not receiving LACP PDUs from the switch for that specific port.
-  * *Verdict:* Contact the Network team. Instruct them to verify the switch port channel is configured as "LACP Active" (not static `on`) and that the specific switch port is not in a suspended state.
+> **🛠️ Action to Take (If Port Participation is False):**
+> * 👥 **Responsible Team:** **Network Team**
+> * **Fix:** If a port shows as `participating: false`, the NetApp is not receiving LACP PDUs from the switch for that specific port. The Network team must verify the switch port-channel is configured as "LACP Active" (not static `on`) and that the specific switch port is not in a suspended state.
 
 ---
 
@@ -193,6 +201,7 @@ network port ifgrp show -node <node_name> -ifgrp <ifgrp_name> -instance
 
 **Step 1: The "Soft Reset" (Bounce the Port) 🔄**
 Sometimes the port transceiver logic hangs. Bounce the port administratively to force a re-negotiation of the physical link.
+> * 👥 **Responsible Team:** **Storage Team**
 ```bash
 # 1. Bring the port down
 network port modify -node <node_name> -port <port_name> -up-admin false
@@ -202,7 +211,8 @@ network port modify -node <node_name> -port <port_name> -up-admin true
 ```
 
 **Step 2: SFP / Optical Power Verification (Advanced) 🔦**
-If you suspect the SFP (transceiver) is dying, you can pull the raw hardware data to check optical transmit/receive power levels using the advanced node shell.
+If you suspect the SFP (transceiver) is dying, pull the raw hardware data to check optical transmit/receive power levels using the advanced node shell.
+> * 👥 **Responsible Team:** **Storage Team**
 ```bash
 # Enter the node run shell
 system node run -node <node_name>
@@ -213,8 +223,9 @@ sysconfig -a 0
 *(Look for the specific port and check if it says "SFP Not Present" or shows extremely low Rx/Tx power levels, indicating a bent fiber or dead optic).*
 
 **Step 3: Physical Swap Isolation (The Swap Test) 🔁**
-If the link remains down, you must perform the swap test to isolate the hardware:
+If the link remains down, perform the swap test to isolate the hardware.
+> * 👥 **Responsible Team:** **Data Center Tech / Network Team**
 1. **Swap the Cable:** Replace the fiber/copper cable with a known good one. If the link comes up, the cable was bad.
 2. **Swap the Switch Port:** Move the cable to a different port on the upstream switch. If the link comes up, the switch port was dead.
 3. **Swap the SFP (NetApp Side):** If the switch port and cable are proven good, replace the SFP in the NetApp controller. 
-4. **NetApp Motherboard/NIC:** If all above steps fail, the physical NIC or port on the NetApp controller is dead. Open a NetApp Support case to dispatch a replacement NIC or controller motherboard.
+4. **NetApp Motherboard/NIC:** If all above steps fail, the physical NIC or port on the NetApp controller is dead. The **Storage Team** must open a NetApp Support case to dispatch a replacement NIC or controller motherboard.
