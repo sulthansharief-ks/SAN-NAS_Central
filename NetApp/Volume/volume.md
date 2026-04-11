@@ -1,6 +1,6 @@
 # 📦 NetApp ONTAP (9.x) — Volume Operations (Scratch ➜ Advanced) 🚀
 > ✅ **Rule:** This cheat-sheet sticks to **volume-scoped commands only** (i.e., commands that start with `volume ...`).
-> 🏷️ Replace placeholders like `<SVM> <VOL> <AGGR> <SIZE>` etc.
+> 🏷️ Replace placeholders like `<SVM> <VOL> <AGGR> <SIZE>` etc. with your environment's details.
 
 ## 📑 Table of Contents
 1. [🧰 0) Quick CLI Helpers](#quick-cli)
@@ -25,25 +25,24 @@
 
 <a id="quick-cli"></a>
 ## 🧰 0) Quick CLI Helpers (Exceptions to the rule)
-- `man volume`
-- `volume ?`
-- `volume create ?`
-- `set -privilege advanced`   ⚙️
-- `set -privilege admin`      ✅
+- `man volume` (View the manual for volume commands)
+- `volume ?` (List all volume subcommands)
+- `volume create ?` (List all flags for volume creation)
+- `set -privilege advanced`  ⚙️ (Unlock hidden/advanced commands)
+- `set -privilege admin`     ✅ (Return to safe admin mode)
 
 ---
 
 <a id="create-volume"></a>
 ## 🆕 1) Create a Volume (from scratch)
-### 1.1 Basic create
+### 1.1 Basic create (Unmounted / SAN typically)
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -state online`
 
-### 1.2 NAS-style create (with junction path)
+### 1.2 NAS-style create (Mounted with junction path)
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -state online -junction-path /<VOL>`
 
-### 1.3 Common create options
-- `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -state online -comment "App volume"`
-- `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -space-guarantee none`
+### 1.3 Common create options (Thin provisioning, Security, Policies)
+- `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -space-guarantee none` *(Thin Provisioned)*
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -snapshot-policy default`
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -security-style unix`
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -unix-permissions 0770`
@@ -57,14 +56,14 @@
 - `volume show -vserver <SVM>`
 - `volume show -vserver <SVM> -volume <VOL>`
 
-### 2.2 Show useful fields
+### 2.2 Show useful fields (Custom views)
 - `volume show -vserver <SVM> -volume <VOL> -fields state,size,aggregate,used,available,percent-used`
 - `volume show -vserver <SVM> -fields vserver,volume,aggregate,state,size,used,available,percent-used,junction-path,security-style,space-guarantee`
 
 ### 2.3 Deep detail (everything)
 - `volume show -vserver <SVM> -volume <VOL> -instance`
 
-### 2.4 Space breakdown
+### 2.4 Space breakdown (What is eating the space?)
 - `volume show-space -vserver <SVM> -volume <VOL>`
 - `volume show-footprint -vserver <SVM> -volume <VOL>`
 
@@ -72,22 +71,22 @@
 
 <a id="state-ops"></a>
 ## 🟢🔴 3) State Operations (online/offline/restrict)
-- `volume online   -vserver <SVM> -volume <VOL>`
-- `volume offline  -vserver <SVM> -volume <VOL>`
-- `volume restrict -vserver <SVM> -volume <VOL>`  ⚠️ (restricted state for some ops)
+- `volume online  -vserver <SVM> -volume <VOL>`
+- `volume offline -vserver <SVM> -volume <VOL>` *(Required before deletion)*
+- `volume restrict -vserver <SVM> -volume <VOL>` ⚠️ *(Used rarely, mostly for legacy SnapMirror init)*
 
 ---
 
 <a id="mount-unmount"></a>
 ## 🧷 4) Mount / Unmount (Junction Path for NAS volumes)
-### 4.1 Show junction
+### 4.1 Show junction path
 - `volume show -vserver <SVM> -volume <VOL> -fields junction-path`
 
 ### 4.2 Mount / change junction
 - `volume mount   -vserver <SVM> -volume <VOL> -junction-path /<VOL>`
 - `volume mount   -vserver <SVM> -volume <VOL> -junction-path /data/<VOL>`
 
-### 4.3 Unmount
+### 4.3 Unmount (Takes the share offline for users)
 - `volume unmount -vserver <SVM> -volume <VOL>`
 
 ---
@@ -102,51 +101,53 @@
 - `volume modify -vserver <SVM> -volume <VOL> -unix-permissions 0770`
 - `volume modify -vserver <SVM> -volume <VOL> -security-style unix`
 - `volume modify -vserver <SVM> -volume <VOL> -snapshot-policy default`
-- `volume modify -vserver <SVM> -volume <VOL> -snapshot-reserve 5`
+- `volume modify -vserver <SVM> -volume <VOL> -percent-snapshot-space 5` *(Changes snapshot reserve %)*
 
 ### 5.3 Space guarantee (thin vs thick)
 - `volume show   -vserver <SVM> -volume <VOL> -fields space-guarantee`
-- `volume modify -vserver <SVM> -volume <VOL> -space-guarantee none`      🪶 thin
-- `volume modify -vserver <SVM> -volume <VOL> -space-guarantee volume`    🧱 thick
+- `volume modify -vserver <SVM> -volume <VOL> -space-guarantee none`       🪶 *(Thin Provisioned)*
+- `volume modify -vserver <SVM> -volume <VOL> -space-guarantee volume`     🧱 *(Thick Provisioned)*
 
 ---
 
 <a id="resize"></a>
 ## 📏 6) Resize (Grow/Shrink) + Autosize
-### 6.1 Resize
+### 6.1 Manual Resize
 - `volume show -vserver <SVM> -volume <VOL> -fields size,used,available,percent-used`
-- `volume size -vserver <SVM> -volume <VOL> -new-size 1TB`
+- `volume size -vserver <SVM> -volume <VOL> -new-size 1TB` *(Sets absolute size to 1TB)*
+- `volume size -vserver <SVM> -volume <VOL> -new-size +100GB` *(Adds 100GB to current size)*
+- `volume size -vserver <SVM> -volume <VOL> -new-size -50GB` *(Shrinks by 50GB)*
 
 ### 6.2 Autosize (autogrow / grow_shrink)
-Show autosize:
+Show autosize status:
 - `volume show -vserver <SVM> -volume <VOL> -fields autosize-mode,autosize-maximum-size,autosize-grow-threshold-percent`
 
-Enable grow:
+Enable grow only:
 - `volume autosize -vserver <SVM> -volume <VOL> -mode grow -maximum-size 2TB -grow-threshold-percent 85`
 
 Enable grow + shrink:
 - `volume autosize -vserver <SVM> -volume <VOL> -mode grow_shrink -maximum-size 2TB -grow-threshold-percent 85 -shrink-threshold-percent 60`
 
-Disable:
+Disable autosize:
 - `volume autosize -vserver <SVM> -volume <VOL> -mode off`
 
 ---
 
 <a id="efficiency"></a>
 ## 🗜️ 7) Efficiency (Dedup/Compression/Compaction)
-Show:
+Show efficiency status and savings:
 - `volume efficiency show -vserver <SVM> -volume <VOL>`
 - `volume efficiency show -vserver <SVM> -volume <VOL> -instance`
 
-Enable/Disable:
+Enable/Disable on a volume:
 - `volume efficiency on  -vserver <SVM> -volume <VOL>`
 - `volume efficiency off -vserver <SVM> -volume <VOL>`
 
-Run/Stop:
-- `volume efficiency start -vserver <SVM> -volume <VOL>`
+Run/Stop a manual scan:
+- `volume efficiency start -vserver <SVM> -volume <VOL> -scan-old-data true`
 - `volume efficiency stop  -vserver <SVM> -volume <VOL>`
 
-Policy (if you use them):
+Efficiency Policy Management:
 - `volume efficiency policy show -vserver <SVM>`
 - `volume efficiency policy create -vserver <SVM> -policy <POLICY_NAME> -schedule daily`
 - `volume efficiency modify -vserver <SVM> -volume <VOL> -policy <POLICY_NAME>`
@@ -155,19 +156,27 @@ Policy (if you use them):
 
 <a id="snapshots"></a>
 ## 📸 8) Snapshots (volume snapshot operations)
-### 8.1 Show / create / delete
+### 8.1 Show / Create / Rename / Delete
 - `volume snapshot show   -vserver <SVM> -volume <VOL>`
 - `volume snapshot create -vserver <SVM> -volume <VOL> -snapshot <SNAP_NAME>`
+- `volume snapshot rename -vserver <SVM> -volume <VOL> -snapshot <OLD_SNAP> -new-name <NEW_SNAP>`
 - `volume snapshot delete -vserver <SVM> -volume <VOL> -snapshot <SNAP_NAME>`
 
-### 8.2 Restore (revert) ⚠️ destructive
+### 8.2 Restore Operations (Single File vs. Whole Volume)
+**Scenario A: Restore a Single File (Safe & Recommended)**
+Use this to grab a single corrupted/deleted file out of a snapshot without affecting the rest of the volume. 
+*(Note: Path must be relative to the volume root)*
+- `volume snapshot restore-file -vserver <SVM> -volume <VOL> -snapshot <SNAP_NAME> -path /<relative/path/to/file.txt>`
+
+**Scenario B: Revert the Entire Volume (⚠️ HIGHLY DESTRUCTIVE)**
+Reverts the *entire* volume back to the exact state it was in at the time of the snapshot. **All data written after the snapshot will be permanently lost**, and all newer snapshots will be deleted.
 - `volume snapshot restore -vserver <SVM> -volume <VOL> -snapshot <SNAP_NAME>`
 
-### 8.3 Snapshot reserve
-- `volume show   -vserver <SVM> -volume <VOL> -fields snapshot-reserve`
-- `volume modify -vserver <SVM> -volume <VOL> -snapshot-reserve 5`
+### 8.3 Snapshot Reserve (Hidden snapshot space)
+- `volume show   -vserver <SVM> -volume <VOL> -fields percent-snapshot-space`
+- `volume modify -vserver <SVM> -volume <VOL> -percent-snapshot-space 5` *(Sets 5% of vol for snapshots)*
 
-### 8.4 Snapshot policy (still volume-scoped)
+### 8.4 Snapshot Policy (Volume-scoped attachment)
 - `volume snapshot policy show -vserver <SVM>`
 - `volume snapshot policy create -vserver <SVM> -policy <POLICY> -enabled true`
 - `volume snapshot policy add-schedule     -vserver <SVM> -policy <POLICY> -schedule hourly -count 24`
@@ -178,17 +187,17 @@ Policy (if you use them):
 
 <a id="flexclone"></a>
 ## 🧬 9) FlexClone (Volume Clones)
-### 9.1 Create clone (from snapshot)
+### 9.1 Create clone (Instant, zero-copy clone from a snapshot)
 - `volume snapshot show -vserver <SVM> -volume <VOL>`
 - `volume clone create -vserver <SVM> -flexclone <CLONE_VOL> -type RW -parent-volume <VOL> -parent-snapshot <SNAP_NAME>`
 
-(Optional junction on clone):
+*(Optional: Mount the clone to access it)*:
 - `volume mount -vserver <SVM> -volume <CLONE_VOL> -junction-path /<CLONE_VOL>`
 
 Show clones:
 - `volume clone show -vserver <SVM>`
 
-### 9.2 Split clone (make independent)
+### 9.2 Split clone (Make it independent from parent - consumes space)
 - `volume clone split start -vserver <SVM> -flexclone <CLONE_VOL>`
 - `volume clone split show  -vserver <SVM> -flexclone <CLONE_VOL>`
 - `volume clone split stop  -vserver <SVM> -flexclone <CLONE_VOL>`
@@ -196,15 +205,15 @@ Show clones:
 ---
 
 <a id="volume-move"></a>
-## 🚚 10) Volume Move (between aggregates)
-Show status:
+## 🚚 10) Volume Move (Non-disruptive migration between aggregates)
+Show move status:
 - `volume move show`
 - `volume move show -vserver <SVM> -volume <VOL>`
 
 Start move:
 - `volume move start -vserver <SVM> -volume <VOL> -destination-aggregate <DEST_AGGR>`
 
-Control:
+Control an active move:
 - `volume move pause  -vserver <SVM> -volume <VOL>`
 - `volume move resume -vserver <SVM> -volume <VOL>`
 - `volume move abort  -vserver <SVM> -volume <VOL>`
@@ -212,18 +221,18 @@ Control:
 ---
 
 <a id="encryption"></a>
-## 🔐 11) Volume Encryption (if supported)
-Create encrypted volume:
+## 🔐 11) Volume Encryption (NVE - Requires License/KMS)
+Create a new encrypted volume:
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -encrypt true`
 
 Show encryption flag:
-- `volume show -vserver <SVM> -volume <VOL> -fields is-encrypted`
+- `volume show -vserver <SVM> -volume <VOL> -fields is-encrypted,encryption-state`
 
-Convert existing volume to encrypted:
+Convert existing unencrypted volume to encrypted (In-place):
 - `volume encryption conversion start -vserver <SVM> -volume <VOL>`
 - `volume encryption conversion show`
 
-Rekey:
+Rekey (Rotate encryption keys):
 - `volume encryption rekey start -vserver <SVM> -volume <VOL>`
 - `volume encryption rekey show`
 
@@ -235,11 +244,11 @@ Show tiering fields:
 - `volume show -vserver <SVM> -volume <VOL> -fields tiering-policy,tiering-minimum-cooling-days,cloud-retrieval-policy`
 
 Set tiering policy:
-- `volume modify -vserver <SVM> -volume <VOL> -tiering-policy none`
-- `volume modify -vserver <SVM> -volume <VOL> -tiering-policy snapshot-only`
-- `volume modify -vserver <SVM> -volume <VOL> -tiering-policy auto`
+- `volume modify -vserver <SVM> -volume <VOL> -tiering-policy none` *(Keep all data on hot tier)*
+- `volume modify -vserver <SVM> -volume <VOL> -tiering-policy snapshot-only` *(Tier only snapshots)*
+- `volume modify -vserver <SVM> -volume <VOL> -tiering-policy auto` *(Tier all cold data)*
 
-Set cooling days:
+Set cooling days (How long data must be cold before tiering):
 - `volume modify -vserver <SVM> -volume <VOL> -tiering-minimum-cooling-days 31`
 
 ---
@@ -275,12 +284,10 @@ Show quota rules (all / for policy):
 - `volume quota policy rule show -vserver <SVM>`
 - `volume quota policy rule show -vserver <SVM> -policy-name <QP_NAME>`
 
-Create quota rules (examples)
-
 **User quota (cap a user at 100GB):**
 - `volume quota policy rule create -vserver <SVM> -policy-name <QP_NAME> -volume <VOL> -type user -target <USER_OR_ID> -qtree "" -disk-limit 100GB`
 
-**Qtree (tree) quota (cap a qtree at 50GB/500GB etc.):**
+**Qtree (tree) quota (cap a qtree at 500GB):**
 - `volume quota policy rule create -vserver <SVM> -policy-name <QP_NAME> -volume <VOL> -type tree -target <QTREE> -disk-limit 500GB`
 
 ### 14.3 Assign the NEW quota policy to the volume
@@ -307,17 +314,14 @@ Disable quotas:
 - `volume quota off    -vserver <SVM> -volume <VOL> -foreground`
 
 ### 14.5 Qtree-Specific Quota Workflow (The "Tree Quota")
-> ⚠️ **Note:** You do not assign policies to Qtrees. You assign the policy to the **Volume**, then add a **Tree Rule** for the specific Qtree.
+> ⚠️ **Note:** You do not assign policies directly to Qtrees. You assign the policy to the **Volume**, then add a **Tree Rule** for the specific Qtree.
 
 1. **Identify the Volume's active policy:**
    - `volume show -vserver <SVM> -volume <VOL> -fields quota-policy`
-
-2. **Add a "Tree Rule" to that policy:** (e.g., limit Qtree to 50GB)
+2. **Add a "Tree Rule" to that policy:**
    - `volume quota policy rule create -vserver <SVM> -policy-name <CURRENT_POLICY_NAME> -volume <VOL> -type tree -target <QTREE_NAME> -disk-limit 50GB`
-
 3. **Activate the change (Resize):**
    - `volume quota resize -vserver <SVM> -volume <VOL> -foreground`
-
 4. **Verify:**
    - `volume quota report -vserver <SVM> -volume <VOL> -qtree <QTREE_NAME>`
 
@@ -326,18 +330,18 @@ Disable quotas:
 <a id="delete-recovery"></a>
 ## 🗑️ 15) Delete + Recovery Queue (safer deletes)
 ### 15.1 Standard delete flow
-- `volume unmount -vserver <SVM> -volume <VOL>`   (if NAS mounted)
-- `volume offline  -vserver <SVM> -volume <VOL>`
-- `volume delete   -vserver <SVM> -volume <VOL>`
+- `volume unmount -vserver <SVM> -volume <VOL>`  *(Mandatory if junction path exists)*
+- `volume offline -vserver <SVM> -volume <VOL>`  *(Mandatory before delete)*
+- `volume delete  -vserver <SVM> -volume <VOL>`
 
-### 15.2 Recovery queue (if available)
-Show deleted volumes:
+### 15.2 Recovery queue (ONTAP 9.4+ Volume Retention)
+Show deleted volumes held in the recovery queue:
 - `volume recovery-queue show`
 
-Restore (Recover):
+Restore (Recover) a deleted volume before it expires:
 - `volume recovery-queue recover -vserver <SVM> -volume <VOL>`
 
-Purge permanently ☠️:
+Purge permanently ☠️ (Skip retention period):
 - `volume recovery-queue purge -vserver <SVM> -volume <VOL>`
 
 ---
