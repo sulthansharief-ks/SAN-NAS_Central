@@ -64,4 +64,4 @@ seccertmgmt show -cert https
 ```
 
 ---
-**Would you like to proceed with the Self-Signed method, or do you need to generate a CSR for your CA? 🤔**
+
