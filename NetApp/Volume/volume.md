@@ -25,6 +25,8 @@
 
 <a id="quick-cli"></a>
 ## 🧰 0) Quick CLI Helpers (Exceptions to the rule)
+> *Commands to help you navigate the ONTAP CLI faster and unlock advanced capabilities.*
+
 - `man volume` (View the manual for volume commands)
 - `volume ?` (List all volume subcommands)
 - `volume create ?` (List all flags for volume creation)
@@ -35,6 +37,8 @@
 
 <a id="create-volume"></a>
 ## 🆕 1) Create a Volume (from scratch)
+> *Allocates a logical container on a physical aggregate to store your data.*
+
 ### 1.1 Basic create (Unmounted / SAN typically)
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -state online`
 
@@ -51,6 +55,8 @@
 
 <a id="show-inventory"></a>
 ## 👀 2) Show / Inventory / Inspect
+> *Commands to view the health, capacity, and configuration of your volumes.*
+
 ### 2.1 List volumes
 - `volume show`
 - `volume show -vserver <SVM>`
@@ -71,6 +77,8 @@
 
 <a id="state-ops"></a>
 ## 🟢🔴 3) State Operations (online/offline/restrict)
+> *Controls the operational availability of a volume to users and applications.*
+
 - `volume online  -vserver <SVM> -volume <VOL>`
 - `volume offline -vserver <SVM> -volume <VOL>` *(Required before deletion)*
 - `volume restrict -vserver <SVM> -volume <VOL>` ⚠️ *(Used rarely, mostly for legacy SnapMirror init)*
@@ -79,6 +87,8 @@
 
 <a id="mount-unmount"></a>
 ## 🧷 4) Mount / Unmount (Junction Path for NAS volumes)
+> *Attaches a NAS volume to the SVM's namespace so clients can route to it and access files.*
+
 ### 4.1 Show junction path
 - `volume show -vserver <SVM> -volume <VOL> -fields junction-path`
 
@@ -93,6 +103,8 @@
 
 <a id="modify-rename"></a>
 ## ✍️ 5) Modify / Rename / Comment
+> *Alters the properties, naming, or security style of an existing volume.*
+
 ### 5.1 Rename volume
 - `volume rename -vserver <SVM> -volume <OLD_VOL> -newname <NEW_VOL>`
 
@@ -112,6 +124,8 @@
 
 <a id="resize"></a>
 ## 📏 6) Resize (Grow/Shrink) + Autosize
+> *Expands or shrinks a volume's capacity, either manually or via automated thresholds.*
+
 ### 6.1 Manual Resize
 - `volume show -vserver <SVM> -volume <VOL> -fields size,used,available,percent-used`
 - `volume size -vserver <SVM> -volume <VOL> -new-size 1TB` *(Sets absolute size to 1TB)*
@@ -135,6 +149,8 @@ Disable autosize:
 
 <a id="efficiency"></a>
 ## 🗜️ 7) Efficiency (Dedup/Compression/Compaction)
+> *Saves physical disk space by removing duplicate data blocks and compressing files.*
+
 Show efficiency status and savings:
 - `volume efficiency show -vserver <SVM> -volume <VOL>`
 - `volume efficiency show -vserver <SVM> -volume <VOL> -instance`
@@ -156,6 +172,8 @@ Efficiency Policy Management:
 
 <a id="snapshots"></a>
 ## 📸 8) Snapshots (volume snapshot operations)
+> *Creates instant, read-only, point-in-time copies of a volume for backup and rapid recovery.*
+
 ### 8.1 Show / Create / Rename / Delete
 - `volume snapshot show   -vserver <SVM> -volume <VOL>`
 - `volume snapshot create -vserver <SVM> -volume <VOL> -snapshot <SNAP_NAME>`
@@ -187,6 +205,8 @@ Reverts the *entire* volume back to the exact state it was in at the time of the
 
 <a id="flexclone"></a>
 ## 🧬 9) FlexClone (Volume Clones)
+> *Creates instant, writable, zero-capacity copies of a volume for testing, development, or recovery.*
+
 ### 9.1 Create clone (Instant, zero-copy clone from a snapshot)
 - `volume snapshot show -vserver <SVM> -volume <VOL>`
 - `volume clone create -vserver <SVM> -flexclone <CLONE_VOL> -type RW -parent-volume <VOL> -parent-snapshot <SNAP_NAME>`
@@ -205,7 +225,9 @@ Show clones:
 ---
 
 <a id="volume-move"></a>
-## 🚚 10) Volume Move (Non-disruptive migration between aggregates)
+## 🚚 10) Volume Move (between aggregates)
+> *Non-disruptively migrates a live volume from one physical aggregate to another for load balancing or hardware upgrades.*
+
 Show move status:
 - `volume move show`
 - `volume move show -vserver <SVM> -volume <VOL>`
@@ -221,7 +243,9 @@ Control an active move:
 ---
 
 <a id="encryption"></a>
-## 🔐 11) Volume Encryption (NVE - Requires License/KMS)
+## 🔐 11) Volume Encryption (if supported)
+> *Secures data at rest using software or hardware-based encryption keys (NVE/NAE) to prevent unauthorized drive access.*
+
 Create a new encrypted volume:
 - `volume create -vserver <SVM> -volume <VOL> -aggregate <AGGR> -size <SIZE> -encrypt true`
 
@@ -240,6 +264,8 @@ Rekey (Rotate encryption keys):
 
 <a id="tiering"></a>
 ## ☁️ 12) Volume Tiering (FabricPool volume settings)
+> *Automatically moves cold (inactive) data to cheaper object storage (cloud) to free up high-performance SSD space.*
+
 Show tiering fields:
 - `volume show -vserver <SVM> -volume <VOL> -fields tiering-policy,tiering-minimum-cooling-days,cloud-retrieval-policy`
 
@@ -255,6 +281,8 @@ Set cooling days (How long data must be cold before tiering):
 
 <a id="qtrees"></a>
 ## 🌲 13) Qtrees (volume qtree)
+> *Creates logical sub-partitions within a volume, allowing you to apply discrete security styles or quota limits.*
+
 Create qtree:
 - `volume qtree create -vserver <SVM> -volume <VOL> -qtree <QTREE> -security-style unix`
 
@@ -271,6 +299,7 @@ Rename:
 
 <a id="quotas"></a>
 ## 🧾 14) Quotas (volume quota)
+> *Restricts or tracks the amount of disk space and file counts that users, groups, or qtrees can consume.*
 > ✅ This section **creates a new quota policy** (not using `default`), adds rules to it, assigns it to the volume, then compiles quotas.
 
 ### 14.1 Create a NEW quota policy
@@ -329,6 +358,8 @@ Disable quotas:
 
 <a id="delete-recovery"></a>
 ## 🗑️ 15) Delete + Recovery Queue (safer deletes)
+> *Safely destroys volumes and manages the temporary recycle bin to prevent accidental data loss.*
+
 ### 15.1 Standard delete flow
 - `volume unmount -vserver <SVM> -volume <VOL>`  *(Mandatory if junction path exists)*
 - `volume offline -vserver <SVM> -volume <VOL>`  *(Mandatory before delete)*
@@ -348,6 +379,8 @@ Purge permanently ☠️ (Skip retention period):
 
 <a id="power-oneliners"></a>
 ## 🧠 16) “Power” One-Liners (volume-only)
+> *Advanced, chained commands to quickly pull comprehensive reports for daily administration.*
+
 - `volume show -vserver <SVM> -fields volume,aggregate,state,size,used,available,percent-used,junction-path,space-guarantee,is-encrypted,quota-policy`
 - `volume show-space -vserver <SVM> -volume <VOL>`
 - `volume show-footprint -vserver <SVM> -volume <VOL>`
