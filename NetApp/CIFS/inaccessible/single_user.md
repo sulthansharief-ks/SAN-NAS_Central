@@ -12,6 +12,7 @@ When a CIFS share suddenly becomes inaccessible, the issue can hide in the netwo
 5. [🛡️ Phase 5: Share ACLs & Export Policies](#phase-5)
 6. [🔐 Phase 6: NTFS Security (File/Folder Permissions)](#phase-6)
 7. [🔬 Phase 7: Advanced Diagnostics (Sectrace)](#phase-7)
+8. [📚 Phase 8: Official NetApp Documentation Reference](#phase-8)
 
 ---
 
@@ -74,15 +75,16 @@ network interface show -vserver <SVM> -data-protocol cifs -fields status-admin,s
 ```
 * **Target:** `status-admin` is `up`, `status-oper` is `up`, `is-home` is `true`.
 
-> **🛠️ Action to Take (If LIF is down or displaced):**
-> * **If Admin Status is down:**
->   ```bash
->   network interface modify -vserver <SVM> -lif <LIF_NAME> -status-admin up
->   ```
-> * **If LIF is not on its home port:**
->   ```bash
->   network interface revert -vserver <SVM> -lif <LIF_NAME>
->   ```
+**🛠️ Action to Take (If LIF is down or displaced):**
+
+If Admin Status is down:
+```bash
+network interface modify -vserver <SVM> -lif <LIF_NAME> -status-admin up
+```
+If LIF is not on its home port:
+```bash
+network interface revert -vserver <SVM> -lif <LIF_NAME>
+```
 
 ### 1.2 Verify Service/Firewall Policies
 Modern ONTAP uses Service Policies. Ensure the data LIF allows CIFS traffic.
@@ -91,27 +93,29 @@ network interface show -vserver <SVM> -fields service-policy
 ```
 * **Target:** Policy includes `data-cifs` and `data-core`.
 
-> **🛠️ Action to Take (If policy is missing CIFS):**
-> * **Change the LIF to the default data files policy:**
->   ```bash
->   network interface modify -vserver <SVM> -lif <LIF_NAME> -service-policy default-data-files
->   ```
+**🛠️ Action to Take (If policy is missing CIFS):**
 
-### 1.3 Ping Test from Storage
-Can the SVM reach the client?
+Change the LIF to the default data files policy:
 ```bash
-network ping -vserver <SVM> -destination <CLIENT_IP>
+network interface modify -vserver <SVM> -lif <LIF_NAME> -service-policy default-data-files
 ```
 
-> **🛠️ Action to Take (If ping fails):**
-> * **Check SVM routing:** Verify a default route exists back to the client subnet.
->   ```bash
->   network route show -vserver <SVM>
->   ```
-> * **If missing, create the route:**
->   ```bash
->   network route create -vserver <SVM> -destination 0.0.0.0/0 -gateway <GATEWAY_IP>
->   ```
+### 1.3 Ping Test from Storage
+Can the SVM reach the client? Using the specific LIF ensures you are testing the exact routing path the CIFS traffic takes.
+```bash
+network ping -vserver <SVM> -lif <LIF_NAME> -destination <CLIENT_IP>
+```
+
+**🛠️ Action to Take (If ping fails):**
+
+Check SVM routing. Verify a default route exists back to the client subnet.
+```bash
+network route show -vserver <SVM>
+```
+If missing, create the route:
+```bash
+network route create -vserver <SVM> -destination 0.0.0.0/0 -gateway <GATEWAY_IP>
+```
 
 ---
 
@@ -124,11 +128,12 @@ network ping -vserver <SVM> -destination <CLIENT_IP>
 cluster date show
 ```
 
-> **🛠️ Action to Take (If time is skewed > 5 mins):**
-> * **Fix NTP servers to match Domain Controllers:**
->   ```bash
->   cluster time-service ntp server create -server <DC_IP>
->   ```
+**🛠️ Action to Take (If time is skewed > 5 mins):**
+
+Fix NTP servers to match Domain Controllers:
+```bash
+cluster time-service ntp server create -server <DC_IP>
+```
 
 ### 2.2 Verify DNS Resolution
 Can the SVM resolve the Domain Controller?
@@ -136,11 +141,12 @@ Can the SVM resolve the Domain Controller?
 vserver services name-service dns check -vserver <SVM>
 ```
 
-> **🛠️ Action to Take (If DNS check fails):**
-> * **Update or fix DNS server IPs:**
->   ```bash
->   vserver services name-service dns modify -vserver <SVM> -domains <DOMAIN> -name-servers <DNS_IP_1>,<DNS_IP_2>
->   ```
+**🛠️ Action to Take (If DNS check fails):**
+
+Update or fix DNS server IPs:
+```bash
+vserver services name-service dns modify -vserver <SVM> -domains <DOMAIN> -name-servers <DNS_IP_1>,<DNS_IP_2>
+```
 
 ### 2.3 Verify Domain Controller Reachability
 ```bash
@@ -148,8 +154,9 @@ vserver cifs domain discovered-servers show -vserver <SVM>
 ```
 * **Target:** Status is `OK`.
 
-> **🛠️ Action to Take (If status is 'down'):**
-> * **Check network/firewalls:** Verify AD firewall rules are open for the NetApp LIF IPs (ports 53, 88, 135, 139, 389, 445).
+**🛠️ Action to Take (If status is 'down'):**
+
+Check network/firewalls. Verify AD firewall rules are open for the NetApp LIF IPs (ports 53, 88, 135, 139, 389, 445).
 
 ---
 
@@ -162,11 +169,12 @@ vserver cifs domain discovered-servers show -vserver <SVM>
 vserver cifs show -vserver <SVM>
 ```
 
-> **🛠️ Action to Take (If Admin Status is down):**
-> * **Start the CIFS service:**
->   ```bash
->   vserver cifs start -vserver <SVM>
->   ```
+**🛠️ Action to Take (If Admin Status is down):**
+
+Start the CIFS service:
+```bash
+vserver cifs start -vserver <SVM>
+```
 
 ---
 
@@ -180,15 +188,16 @@ volume show -vserver <SVM> -volume <VOL> -fields state,junction-path,junction-ac
 ```
 * **Target:** `state` = `online`, `junction-active` = `true`.
 
-> **🛠️ Action to Take (If volume is offline or unmounted):**
-> * **Online the volume:**
->   ```bash
->   volume online -vserver <SVM> -volume <VOL>
->   ```
-> * **Mount the volume (if junction-path is `-`):**
->   ```bash
->   volume mount -vserver <SVM> -volume <VOL> -junction-path /<VOL>
->   ```
+**🛠️ Action to Take (If volume is offline or unmounted):**
+
+Online the volume:
+```bash
+volume online -vserver <SVM> -volume <VOL>
+```
+Mount the volume (if junction-path is `-`):
+```bash
+volume mount -vserver <SVM> -volume <VOL> -junction-path /<VOL>
+```
 
 ### 4.2 Verify Qtree (If share is on a Qtree)
 ```bash
@@ -196,11 +205,12 @@ volume qtree show -vserver <SVM> -volume <VOL> -qtree <QTREE> -fields security-s
 ```
 * **Target:** Security style is `ntfs`. If it's `unix`, Windows ACLs will behave erratically.
 
-> **🛠️ Action to Take (If security style is UNIX):**
-> * **Change security style to NTFS:**
->   ```bash
->   volume qtree modify -vserver <SVM> -volume <VOL> -qtree <QTREE> -security-style ntfs
->   ```
+**🛠️ Action to Take (If security style is UNIX):**
+
+Change security style to NTFS:
+```bash
+volume qtree modify -vserver <SVM> -volume <VOL> -qtree <QTREE> -security-style ntfs
+```
 
 ---
 
@@ -218,23 +228,25 @@ volume show -vserver <SVM> -volume <VOL> -fields policy
 vserver export-policy rule show -vserver <SVM> -policyname <POLICY_NAME>
 ```
 
-> **🛠️ Action to Take (If rules block the client IP):**
-> * **Create a rule allowing the client network (or all IPs):**
->   ```bash
->   vserver export-policy rule create -vserver <SVM> -policyname <POLICY_NAME> -clientmatch 0.0.0.0/0 -rorule any -rwrule any -protocols cifs
->   ```
-> *(Note: Verify the SVM Root Volume's export policy allows traversal as well).*
+**🛠️ Action to Take (If rules block the client IP):**
+
+Create a rule allowing the client network (or all IPs). *(Note: Added mandatory `-ruleindex` parameter and corrected singular `-protocol` flag from previous versions).*
+```bash
+vserver export-policy rule create -vserver <SVM> -policyname <POLICY_NAME> -ruleindex 1 -clientmatch 0.0.0.0/0 -rorule any -rwrule any -protocol cifs
+```
+*(Note: Verify the SVM Root Volume's export policy allows traversal as well).*
 
 ### 5.2 Verify CIFS Share ACLs
 ```bash
 vserver cifs share access-control show -vserver <SVM> -share <SHARE>
 ```
 
-> **🛠️ Action to Take (If user/group is missing):**
-> * **Add the specific user or AD group:**
->   ```bash
->   vserver cifs share access-control create -vserver <SVM> -share <SHARE> -user-or-group "<DOMAIN>\<User_or_Group>" -permission Full_Control
->   ```
+**🛠️ Action to Take (If user/group is missing):**
+
+Add the specific user or AD group:
+```bash
+vserver cifs share access-control create -vserver <SVM> -share <SHARE> -user-or-group "<DOMAIN>\<User_or_Group>" -permission Full_Control
+```
 
 ---
 
@@ -248,13 +260,14 @@ You can view the effective NTFS permissions directly from the storage CLI withou
 vserver security file-directory show -vserver <SVM> -path /<VOL>/<QTREE>
 ```
 
-> **🛠️ Action to Take (If permissions are broken):**
-> * **Take Ownership via Windows MMC (Best Practice):**
->   1. Open Computer Management (`compmgmt.msc`) on a Windows machine logged in as a Domain Admin.
->   2. Connect to the NetApp CIFS server IP (Action > Connect to another computer).
->   3. Go to System Tools > Shared Folders > Shares. 
->   4. Right-click the problem share > Properties > Security tab > Advanced.
->   5. Change the Owner to Domain Admins, push inheritance, and grant Full Control.
+**🛠️ Action to Take (If permissions are broken):**
+
+Take Ownership via Windows MMC (Best Practice):
+1. Open Computer Management (`compmgmt.msc`) on a Windows machine logged in as a Domain Admin.
+2. Connect to the NetApp CIFS server IP (Action > Connect to another computer).
+3. Go to System Tools > Shared Folders > Shares. 
+4. Right-click the problem share > Properties > Security tab > Advanced.
+5. Change the Owner to Domain Admins, push inheritance, and grant Full Control.
 
 ---
 
@@ -269,21 +282,37 @@ vserver security trace filter create -vserver <SVM> -index 1 -client-ip <CLIENT_
 ```
 
 ### 7.2 Reproduce the Error
-> **🛠️ Action to Take:** Have the user try to access the CIFS share from their Windows machine (`\\<SVM_IP>\<SHARE>`) to trigger the "Access Denied" error.
+**🛠️ Action to Take:** Have the user try to access the CIFS share from their Windows machine (`\\<SVM_IP>\<SHARE>`) to trigger the "Access Denied" error.
 
 ### 7.3 View the Trace Results
 ```bash
 vserver security trace trace-result show -vserver <SVM>
 ```
-> **🛠️ Action to Take:** Look at the `Reason` column. It will explicitly tell you the failure point. Fix the corresponding layer based on the output:
-> * `Access denied by export policy` -> Fix Phase 5.1
-> * `Access denied by share ACL` -> Fix Phase 5.2
-> * `Access denied by NTFS security descriptor` -> Fix Phase 6
-> * `User mapping failed` -> Check `vserver name-mapping show`
+**🛠️ Action to Take:** Look at the `Reason` column. It will explicitly tell you the failure point. Fix the corresponding layer based on the output:
+* `Access denied by export policy` -> Fix Phase 5.1
+* `Access denied by share ACL` -> Fix Phase 5.2
+* `Access denied by NTFS security descriptor` -> Fix Phase 6
+* `User mapping failed` -> Check `vserver name-mapping show`
 
 ### 7.4 Cleanup the Trace
 Don't leave the trace running forever, as it consumes CPU.
-> **🛠️ Action to Take:**
-> ```bash
-> vserver security trace filter delete -vserver <SVM> -index 1
-> ```
+```bash
+vserver security trace filter delete -vserver <SVM> -index 1
+```
+
+---
+
+<a id="phase-8"></a>
+## 📚 Phase 8: Official NetApp Documentation Reference
+*Below are the verified ONTAP 9 official documentation links for the commands utilized in this SOP.*
+
+| Command / Component | Official NetApp Documentation Reference |
+| :--- | :--- |
+| `network interface` & `network route` | [ONTAP 9 Network Management Guide](https://docs.netapp.com/us-en/ontap/network-management/index.html) |
+| `network ping` | [Docs: network ping commands](https://docs.netapp.com/us-en/ontap-cli/network-ping.html) |
+| `cluster time-service` | [Docs: cluster time-service commands](https://docs.netapp.com/us-en/ontap-cli/cluster-time-service-ntp-server-create.html) |
+| `vserver cifs` & `vserver services` | [ONTAP 9 SMB/CIFS Reference](https://docs.netapp.com/us-en/ontap/smb-admin/index.html) |
+| `volume` & `volume qtree` | [ONTAP 9 Logical Storage Management Guide](https://docs.netapp.com/us-en/ontap/volumes/index.html) |
+| `vserver export-policy rule` | [Docs: vserver export-policy rule create](https://docs.netapp.com/us-en/ontap-cli/vserver-export-policy-rule-create.html) |
+| `vserver security file-directory show` | [Docs: vserver security file-directory](https://docs.netapp.com/us-en/ontap-cli/vserver-security-file-directory-show.html) |
+| `vserver security trace` | [Docs: Tracing file access to troubleshoot SMB issues](https://docs.netapp.com/us-en/ontap/smb-admin/trace-file-access-troubleshoot-issues-concept.html) |
