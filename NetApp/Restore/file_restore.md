@@ -13,6 +13,7 @@ This Standard Operating Procedure (SOP) covers both methodologies, strictly adhe
 2. [💻 Phase 2: Admin-Driven Restore via ONTAP CLI (Storage Team)](#phase-2)
 3. [🪟 Phase 3: Client-Driven Restore via Windows/CIFS (End User / Windows Team)](#phase-3)
 4. [🐧 Phase 4: Client-Driven Restore via Linux/NFS (Linux Team)](#phase-4)
+5. [📚 Phase 5: Official NetApp Documentation Reference](#phase-5)
 
 ---
 
@@ -116,7 +117,7 @@ Use this if you want to completely overwrite the corrupted/modified file with th
 >   4. Select the desired timestamp.
 >   5. Click **Copy...** to extract the file to the desktop, or **Restore...** to overwrite the live file on the NetApp.
 >
-> *(Note: If the "Previous Versions" tab is entirely empty, escalate to the **Storage Team** to verify `show-previous-versions` is enabled on the CIFS share via `vserver cifs share properties show`).*
+> *(Note: If the "Previous Versions" tab is entirely empty, escalate to the **Storage Team** to verify the `show-previous-versions` property is enabled on the CIFS share via `vserver cifs share show -vserver <SVM_Name> -share-name <SHARE> -fields share-properties`).*
 
 ---
 
@@ -147,3 +148,17 @@ Use this if you want to completely overwrite the corrupted/modified file with th
 >      # Syntax: cp <snapshot_dir>/<filename> <live_destination>
 >      cp hourly.2026-04-09_1405/Q1.pdf /mnt/finance/reports/Q1_RESTORED.pdf
 >      ```
+
+---
+
+<a id="phase-5"></a>
+## 📚 Phase 5: Official NetApp Documentation Reference
+*Below are the verified ONTAP 9 official documentation links for the commands utilized in this SOP.*
+
+| Command / Task | Official NetApp Documentation Reference |
+| :--- | :--- |
+| `volume snapshot show` | [Docs: volume snapshot show](https://docs.netapp.com/us-en/ontap-cli/volume-snapshot-show.html) |
+| `volume modify -snapdir-access` | [Docs: volume modify](https://docs.netapp.com/us-en/ontap-cli/volume-modify.html) |
+| `volume snapshot restore-file` | [Docs: volume snapshot restore-file](https://docs.netapp.com/us-en/ontap-cli/volume-snapshot-restore-file.html) |
+| `vserver cifs share show` | [Docs: vserver cifs share show](https://docs.netapp.com/us-en/ontap-cli/vserver-cifs-share-show.html) |
+| File Restoration Task Guide | [Docs: Restore a single file from an ONTAP snapshot](https://docs.netapp.com/us-en/ontap/data-protection/restore-single-file-snapshot-task.html) |
