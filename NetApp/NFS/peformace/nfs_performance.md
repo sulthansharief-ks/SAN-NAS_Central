@@ -12,6 +12,7 @@ This Standard Operating Procedure (SOP) provides the official, top-down methodol
 3. [🌐 Phase 3: Network & Path Analysis (MTU & Drops)](#phase-3)
 4. [🐧 Phase 4: NFS Protocol & Client-Side Mount Options](#phase-4)
 5. [🔬 Phase 5: Advanced Diagnostics (Packet Trace & Perfstat)](#phase-5)
+6. [📚 Phase 6: Official NetApp Documentation Reference](#phase-6)
 
 ---
 
@@ -131,8 +132,8 @@ This is the #1 cause of NFS slowness. If a client negotiates a tiny block size (
 
 > **🛠️ Action to Take (If block sizes are too small):**
 > * 👥 **Responsible Team:** **Linux OS / UNIX Team**
-> * **Check Client:** >
-> * ```bash
+> * **Check Client:**
+>   ```bash
 >   cat /proc/mounts | grep nfs
 >   ```
 > * **Fix:** Look for `rsize=` and `wsize=`. Over Gigabit/10G networks, these should be **65536** (64K) or **1048576** (1MB). If you see `rsize=4096`, unmount and remount forcing a larger size:
@@ -171,14 +172,14 @@ Linux limits how many concurrent RPC requests it will send to the NetApp. If you
 *If you have exhausted all options, you must capture the raw data to analyze the exact TCP conversation.*
 
 ### 5.1 Run a Packet Trace (tcpdump)
-Capture the raw network traffic directly from the NetApp port to see if the Linux client is dropping packets or experiencing TCP Zero Window events (where the client tells the NetApp to stop sending data because it can't process it fast enough).
+Capture the raw network traffic directly from the NetApp port to see if the Linux client is dropping packets or experiencing TCP Zero Window events. *(Note: The syntax has been corrected to use the native `-address` parameter instead of the invalid `-dst-ip`).*
 
 > **🛠️ Action to Take (To Capture Packets):**
 > * 👥 **Responsible Team:** **Storage Team** (Capture) & **Network Team** (Analysis)
 > * **Storage Action:**
 >   ```bash
 >   # Start trace targeting the client IP
->   network tcpdump start -node <NODE> -port <PORT> -dst-ip <CLIENT_IP>
+>   network tcpdump start -node <NODE> -port <PORT> -address <CLIENT_IP>
 >   
 >   # Stop it after the user reproduces the slowness
 >   network tcpdump stop -node <NODE> -port <PORT>
@@ -196,3 +197,18 @@ If escalating to NetApp Support (TAC), they will require a Perfstat to analyze t
 >      perfstat.exe -t 5 -i 1 -l <Admin_User> -f <Cluster_Mgmt_IP> > nfs_perfstat.out
 >      ```
 >   3. Upload the resulting `.out` or `.tar.gz` archive to your NetApp Support ticket.
+
+---
+
+<a id="phase-6"></a>
+## 📚 Phase 6: Official NetApp Documentation Reference
+*Below are the verified ONTAP 9 official documentation links and technical reports for the diagnostic commands utilized in this SOP.*
+
+| Command / Topic | Official NetApp Documentation Reference |
+| :--- | :--- |
+| `qos statistics volume latency` | [Docs: qos statistics volume latency show](https://docs.netapp.com/us-en/ontap-cli/qos-statistics-volume-latency-show.html) |
+| `storage aggregate show-space` | [Docs: storage aggregate show-space](https://docs.netapp.com/us-en/ontap-cli/storage-aggregate-show-space.html) |
+| `network port statistics` | [Docs: network port statistics show](https://docs.netapp.com/us-en/ontap-cli/network-port-statistics-show.html) |
+| `network tcpdump start` | [Docs: ONTAP commands to diagnose network problems](https://docs.netapp.com/us-en/ontap/networking/commands_for_diagnosing_network_problems.html) |
+| `network tcpdump` (Syntax KB) | [KB: How to capture packet traces (tcpdump) on ONTAP](https://kb.netapp.com/on-prem/ontap/da/NAS/NAS-KBs/How_to_capture_packet_traces_tcpdump_on_ONTAP_92_to_99_systems) |
+| NFS Best Practices | [TR-4067: NFS Best Practices and Implementation Guide](https://www.netapp.com/pdf.html?item=/media/10720-tr-4067.pdf) |
