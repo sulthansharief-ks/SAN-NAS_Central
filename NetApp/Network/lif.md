@@ -1,8 +1,8 @@
 # 🌐 NetApp ONTAP (9.x) — LIF Operations (Scratch ➜ Advanced) 🚀
-> ✅ **Rule:** This cheat-sheet sticks to **interface-scoped commands** (mostly `network interface ...`).
-> 🏷️ Replace placeholders like `<SVM> <LIF> <NODE> <PORT> <IP>` etc.
-> 
-> For LIF Creation : https://docs.netapp.com/us-en/ontap/smb-config/create-lif-task.html
+
+> ✅ **Rule:** This cheat-sheet sticks to **interface-scoped commands** (mostly `network interface ...`). 
+> 🏷️ Replace placeholders like `<SVM>`, `<LIF>`, `<NODE>`, `<PORT>`, `<IP>` with your environment details.
+> ⚠️ **Modern ONTAP (9.10.1+) Warning:** Commands use `-service-policy` instead of legacy `-role`, `-data-protocol`, or `-firewall-policy` parameters.
 
 ## 📑 Table of Contents
 1. [🧰 0) Quick CLI Helpers (Exceptions to the rule)](#section-0)
@@ -17,6 +17,7 @@
 10. [🔎 9) Diagnostics & Reachability](#section-9)
 11. [🗑️ 10) Delete & Cleanup](#section-10)
 12. [🧠 11) "Power" One-Liners (LIF-only)](#section-11)
+13. [📚 12) Official Documentation References](#section-12)
 
 ---
 
@@ -85,12 +86,13 @@ graph TD
 
 <a id="section-1"></a>
 ## 🆕 1) Create a LIF (from scratch)
-### 1.1 Basic Data LIF (NAS/SAN)
-> *Modern ONTAP uses `-service-policy` instead of `-role`.*
+
+### 1.1 Basic Data LIF (NAS: NFS/CIFS)
+> *Modern ONTAP uses `-service-policy` instead of `-role` and `-data-protocol`.*
 - `network interface create -vserver <SVM> -lif <LIF> -service-policy default-data-files -home-node <NODE> -home-port <PORT> -address <IP> -netmask <MASK>`
 
-  **Example:**
--  `network interface create -vserver vs1.example.com -lif datalif1 -role data -data-protocol cifs -home-node node-4 -home-port e1c -address 192.0.2.145 -netmask 255.255.255.0 -firewall-policy data -auto-revert true`
+  **Example (Modern 9.10+ Syntax):**
+- `network interface create -vserver vs1 -lif datalif1 -service-policy default-data-files -home-node node-4 -home-port e1c -address 192.0.2.145 -netmask 255.255.255.0 -auto-revert true`
 
 ### 1.2 Cluster Management LIF
 - `network interface create -vserver <CLUSTER_SVM> -lif <LIF> -service-policy default-management -home-node <NODE> -home-port <PORT> -address <IP> -netmask <MASK>`
@@ -98,9 +100,9 @@ graph TD
 ### 1.3 Intercluster LIF (for SnapMirror)
 - `network interface create -vserver <CLUSTER_SVM> -lif <LIF> -service-policy default-intercluster -home-node <NODE> -home-port <PORT> -address <IP> -netmask <MASK>`
 
-### 1.4 iSCSI/FC Specifics (Data Protocols)
-- `network interface create -vserver <SVM> -lif <LIF> -service-policy default-data-blocks -home-node <NODE> -home-port <PORT> -address <IP> -netmask <MASK>`
-- `network interface create -vserver <SVM> -lif <LIF> -data-protocol fcp -home-node <NODE> -home-port <PORT>` *(FC uses WWPN, no IP)*
+### 1.4 iSCSI/FC Specifics (SAN Data Protocols)
+- **iSCSI:** `network interface create -vserver <SVM> -lif <LIF> -service-policy default-data-blocks -home-node <NODE> -home-port <PORT> -address <IP> -netmask <MASK>`
+- **FC:** `network interface create -vserver <SVM> -lif <LIF> -service-policy default-data-fcp -home-node <NODE> -home-port <PORT>` *(FC relies on WWPNs; no IP/Netmask required)*
 
 ---
 
@@ -113,7 +115,7 @@ graph TD
 
 ### 2.2 Show useful fields (Home vs Current)
 - `network interface show -fields home-node,home-port,curr-node,curr-port,is-home`
-- `network interface show -vserver <SVM> -fields lif,address,service-policy,failover-policy,status-admin,status-oper`
+- `network interface show -vserver <SVM> -fields address,service-policy,failover-policy,status-admin,status-oper`
 
 ### 2.3 Deep detail (everything)
 - `network interface show -vserver <SVM> -lif <LIF> -instance`
@@ -132,7 +134,7 @@ graph TD
 
 <a id="section-4"></a>
 ## 🔁 4) Migration & Revert (Moving LIFs)
-> ⚠️ **Note:** Moving a LIF keeps the IP active but changes the physical path.
+> ⚠️ **Note:** Moving a LIF keeps the IP active but changes the physical network path. SAN LIFs (iSCSI/FC) *cannot* be migrated.
 
 ### 4.1 Manual Migrate (Failover)
 - `network interface migrate -vserver <SVM> -lif <LIF> -destination-node <DEST_NODE> -destination-port <DEST_PORT>`
@@ -157,7 +159,9 @@ graph TD
 - `network interface modify -vserver <SVM> -lif <LIF> -home-node <NEW_HOME_NODE> -home-port <NEW_HOME_PORT>`
 
 ### 5.3 MTU Size (Jumbo Frames)
-- `network interface modify -vserver <SVM> -lif <LIF> -mtu 9000`
+> ⚠️ **Correction:** You cannot modify the MTU directly on a LIF. LIFs inherit MTU from their Broadcast Domain or physical port.
+- **Change Broadcast Domain MTU (Preferred):** `network port broadcast-domain modify -broadcast-domain <DOMAIN> -mtu 9000`
+- **Change Physical Port MTU:** `network port modify -node <NODE> -port <PORT> -mtu 9000`
 
 ---
 
@@ -171,14 +175,14 @@ graph TD
 
 ### 6.3 Assign Failover Policy
 - `network interface modify -vserver <SVM> -lif <LIF> -failover-policy broadcast-domain-wide` *(Standard for NAS)*
-- `network interface modify -vserver <SVM> -lif <LIF> -failover-policy disabled` *(Standard for iSCSI/SAN)*
+- `network interface modify -vserver <SVM> -lif <LIF> -failover-policy disabled` *(Mandatory for iSCSI/SAN)*
 - `network interface modify -vserver <SVM> -lif <LIF> -failover-group <FG_NAME>`
 
 ---
 
 <a id="section-7"></a>
 ## 🚦 7) Service Policies (ONTAP 9.10+)
-> 💡 Replaces the old `-role` and `-firewall-policy` commands. Controls strictly what traffic (SSH, NFS, CIFS, DNS) flows through a LIF.
+> 💡 Controls strictly what traffic (SSH, NFS, CIFS, DNS) flows through a LIF.
 
 ### 7.1 Show Policies
 - `network interface service-policy show`
@@ -198,7 +202,7 @@ graph TD
 <a id="section-8"></a>
 ## 🕸️ 8) Subnets (Automated IP Assignment)
 ### 8.1 Create Subnet
-- `network subnet create -subnet-name <SUBNET> -broadcast-domain <BD> -subnet <10.0.0.0/24> -gateway <10.0.0.1> -ip-ranges <10.0.0.50-10.0.0.100>`
+- `network subnet create -subnet-name <SUBNET> -broadcast-domain <BD> -subnet 10.0.0.0/24 -gateway 10.0.0.1 -ip-ranges 10.0.0.50-10.0.0.100`
 
 ### 8.2 Create LIF using Subnet (No IP needed)
 - `network interface create -vserver <SVM> -lif <LIF> -service-policy default-data-files -home-node <NODE> -home-port <PORT> -subnet-name <SUBNET>`
@@ -214,7 +218,7 @@ graph TD
 - `network traceroute -lif <LIF> -vserver <SVM> -destination <REMOTE_IP>`
 
 ### 9.3 Packet Trace (tcpdump on interface)
-- `network tcpdump start -node <NODE> -port <PORT>`
+- `network tcpdump start -node <NODE> -port <PORT> -address <CLIENT_IP>`
 - `network tcpdump stop -node <NODE> -port <PORT>`
 
 ---
@@ -236,3 +240,18 @@ graph TD
 - `network interface show -failover`
 - `network interface service-policy show`
 - `network interface revert *`
+
+---
+
+<a id="section-12"></a>
+## 📚 12) Official Documentation References
+*All commands verified against official NetApp ONTAP 9 documentation.*
+
+| Task / Feature | Official NetApp Documentation Reference |
+| :--- | :--- |
+| `network interface create / show / modify` | [Docs: network interface commands](https://docs.netapp.com/us-en/ontap-cli/network-interface-create.html) |
+| `network interface migrate / revert` | [Docs: network interface migrate](https://docs.netapp.com/us-en/ontap-cli/network-interface-migrate.html) |
+| `network interface service-policy` | [Docs: network interface service-policy](https://docs.netapp.com/us-en/ontap-cli/network-interface-service-policy-create.html) |
+| `network interface failover-groups` | [Docs: network interface failover-groups](https://docs.netapp.com/us-en/ontap-cli/network-interface-failover-groups-create.html) |
+| `network port broadcast-domain` (MTU Fix) | [Docs: network port broadcast-domain modify](https://docs.netapp.com/us-en/ontap-cli/network-port-broadcast-domain-modify.html) |
+| `network tcpdump start` | [Docs: network tcpdump start](https://docs.netapp.com/us-en/ontap-cli/network-tcpdump-start.html) |
