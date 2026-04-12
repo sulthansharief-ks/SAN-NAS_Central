@@ -1,3 +1,6 @@
+
+---
+
 # 🕵️‍♂️ NetApp ONTAP: Intermittent NFS Export Access Troubleshooting Guide 🛠️
 
 Intermittent NFS access issues usually manifest as hanging terminal sessions, frozen applications, or logs filled with "NFS server not responding" errors that magically resolve themselves minutes later. 
@@ -14,6 +17,7 @@ Because NFS is largely stateless (in v3) or relies heavily on complex state IDs 
     * [Step 3: Storage Performance (RPC Timeouts)](#step-3)
     * [Step 4: Name Services (Intermittent Permission Denied)](#step-4)
     * [Step 5: Advanced Packet Tracing & Sectrace](#step-5)
+3. [📚 Phase 3: Official NetApp Documentation Reference](#phase-3)
 
 ---
 
@@ -66,14 +70,12 @@ graph TD
 ### Step 1: Network & LIF Stability (Flapping)
 *If a physical port is flapping or a Data LIF is migrating between nodes (due to a failover or auto-balance), Linux clients will freeze while the TCP connection resets.*
 
-
 ```bash
 # Check if the NFS Data LIF is currently on its home node and port
 network interface show -vserver <SVM> -data-protocol nfs -fields is-home,curr-node,curr-port
 
 # Check the event logs for recent network link down/up events or LIF migrations (Last 24 hours)
-event log show -messagename *net* -time >1d
-event log show -messagename *vifmgr* -time >1d
+event log show -time >1d -messagename *net*,*vifmgr*
 
 # Check the physical port for incrementing CRC errors or drops
 network port statistics show -node <NODE> -port <PORT>
@@ -95,7 +97,6 @@ network port statistics show -node <NODE> -port <PORT>
 ### Step 2: Client Mount Options (The "Soft" Mount Trap)
 *Incorrect mount options are the leading cause of intermittent NFS application failures.*
 
-
 * **On the Linux Client:** Run `cat /proc/mounts | grep nfs`
 
 > **🛠️ Action to Take:**
@@ -111,7 +112,6 @@ network port statistics show -node <NODE> -port <PORT>
 <a id="step-3"></a>
 ### Step 3: Storage Performance (RPC Timeouts)
 *If the Linux client's RPC timeout (`timeo`) is set to 600 (60 seconds), but the NetApp aggregate is saturated by a backup job and takes 65 seconds to acknowledge a write, the Linux client logs "NFS server not responding".*
-
 
 ```bash
 # Monitor real-time latency during the reported issue times
@@ -135,8 +135,8 @@ qos statistics volume latency show -vserver <SVM> -volume <VOL>
 # Check the status of the LDAP client connection on the SVM
 vserver services name-service ldap check -vserver <SVM>
 
-# Review EMS logs for Name Service (SECD) timeouts
-event log show -messagename secd.ldap*|secd.nis* -time >1d
+# Review EMS logs for Name Service (SECD) timeouts using native OR syntax
+event log show -time >1d -messagename secd.ldap*,secd.nis*
 ```
 
 > **🛠️ Action to Take:**
@@ -156,11 +156,10 @@ event log show -messagename secd.ldap*|secd.nis* -time >1d
 #### 5A: Packet Trace (tcpdump)
 Capture traffic between the node and the specific Linux client experiencing drops.
 ```bash
-network tcpdump start -node <NODE> -port <PORT> -dst-ip <CLIENT_IP>
+network tcpdump start -node <NODE> -port <PORT> -address <CLIENT_IP>
 # (Wait for drop to occur)
 network tcpdump stop -node <NODE> -port <PORT>
 ```
-
 
 > **🛠️ Action to Take:**
 > * 👥 **Responsible Team:** **Network Team**
@@ -181,3 +180,18 @@ vserver security trace filter delete -vserver <SVM> -index 1
 > * **👀 What to Look For:** The `Reason` column in the output will explicitly state why access was blocked.
 > * **🎯 Exact Actions:** >   * If `Access denied by export policy`: Ensure the client IP hasn't changed or isn't routing through a NAT firewall not allowed in the policy.
 >   * If `User mapping failed`: The client is using NFSv4, and the ID Domain in ONTAP (`vserver nfs show`) doesn't match the Linux `/etc/idmapd.conf` file. Make them match.
+
+---
+
+<a id="phase-3"></a>
+## 📚 Phase 3: Official NetApp Documentation Reference
+*Below are the verified ONTAP 9 official documentation links for the diagnostic commands utilized in this SOP.*
+
+| Command / Protocol | Official NetApp Documentation Reference |
+| :--- | :--- |
+| `event log show` | [Docs: event log show](https://docs.netapp.com/us-en/ontap-cli/event-log-show.html) |
+| `qos statistics volume latency` | [Docs: qos statistics volume latency show](https://docs.netapp.com/us-en/ontap-cli/qos-statistics-volume-latency-show.html) |
+| `network tcpdump start` | [Docs: ONTAP commands to diagnose network problems](https://docs.netapp.com/us-en/ontap/networking/commands_for_diagnosing_network_problems.html) |
+| `vserver services name-service ldap` | [Docs: vserver services name-service ldap check](https://docs.netapp.com/us-en/ontap-cli/vserver-services-name-service-ldap-check.html) |
+| `vserver security trace filter` | [Docs: vserver security trace filter create](https://docs.netapp.com/us-en/ontap-cli/vserver-security-trace-filter-create.html) |
+| `network interface` & `network port` | [ONTAP 9 Network Management Guide](https://docs.netapp.com/us-en/ontap/network-management/index.html) |
