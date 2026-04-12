@@ -191,7 +191,7 @@ vserver cifs security show -vserver <SVM> -fields is-smb-encryption-required, is
 > * 👥 **Responsible Team:** **Storage Team** (Capture) & **Network Team** (Analysis)
 > * **Storage Action:** Start the trace targeting the client IP, have the user reproduce the slowness, then stop it.
 >   ```bash
->   network tcpdump start -node <NODE> -port <PORT> -dst-ip <CLIENT_IP>
+>   network tcpdump start -node <NODE> -port <PORT> -address <CLIENT_IP>
 >   # ... wait for user to reproduce ...
 >   network tcpdump stop -node <NODE> -port <PORT>
 >   ```
