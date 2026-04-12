@@ -13,6 +13,7 @@ This guide provides the official top-down methodology to isolate and resolve NFS
 4. [🔐 Phase 4: UNIX Permissions (UID/GID)](#phase-4)
 5. [🐧 Phase 5: Client-Side Mount Issues](#phase-5)
 6. [🔬 Phase 6: Advanced Diagnostics (Sectrace)](#phase-6)
+7. [📚 Phase 7: Official NetApp Documentation Reference](#phase-7)
 
 ---
 
@@ -156,11 +157,16 @@ volume show -vserver <SVM> -volume <VOL> -fields state,junction-path,junction-ac
 
 ### 3.1 The SVM Root Volume Traversal Rule (Crucial!)
 To mount `/vol_data/qtree1`, the client must virtually walk through `/`. If the SVM Root Volume's export policy blocks the client, the mount fails immediately.
-```bash
-# 1. Find the SVM Root Volume name (usually <SVM>_root)
-volume show -vserver <SVM> -volume *_root -fields policy
+*(Note: Corrected the command to dynamically find the Root Volume and fixed the singular `-protocol` and `-ruleindex` syntax).*
 
-# 2. Check the rules on that policy
+```bash
+# 1. Find the SVM Root Volume name
+vserver show -vserver <SVM> -fields rootvolume
+
+# 2. Check the policy assigned to the root volume
+volume show -vserver <SVM> -volume <ROOT_VOL_NAME> -fields policy
+
+# 3. Check the rules on that policy
 vserver export-policy rule show -vserver <SVM> -policyname <ROOT_POLICY_NAME>
 ```
 * **Target:** The root volume MUST have a rule allowing your `<CLIENT_IP>` (or `0.0.0.0/0`) with at least `-rorule sys` or `-rorule any`.
@@ -169,7 +175,7 @@ vserver export-policy rule show -vserver <SVM> -policyname <ROOT_POLICY_NAME>
 > * 👥 **Responsible Team:** **Storage Team**
 > * **Add a read-only traversal rule:**
 >   ```bash
->   vserver export-policy rule create -vserver <SVM> -policyname <ROOT_POLICY_NAME> -clientmatch 0.0.0.0/0 -rorule any -rwrule none -protocols nfs
+>   vserver export-policy rule create -vserver <SVM> -policyname <ROOT_POLICY_NAME> -ruleindex 1 -clientmatch 0.0.0.0/0 -rorule any -rwrule none -protocol nfs
 >   ```
 
 ### 3.2 Verify the Target Volume / Qtree Export Policy
@@ -211,17 +217,19 @@ volume show -vserver <SVM> -volume <VOL> -fields security-style
 
 ### 4.2 Check Folder Permissions from ONTAP
 Check the actual `rwxr-xr-x` permissions on the NetApp disk without needing a client.
+*(Note: ONTAP CLI cannot natively `chmod` UNIX directories. It must be done via a mounted client).*
 ```bash
 vserver security file-directory show -vserver <SVM> -path /<VOL>
 ```
 
 > **🛠️ Action to Take (If UNIX permissions are blocking access):**
-> * 👥 **Responsible Team:** **Storage Team** or **Linux OS Team**
-> * **Storage Action:** Temporarily open permissions from the NetApp CLI to prove it's a UID/GID block:
+> * 👥 **Responsible Team:** **Linux OS Team** & **Storage Team**
+> * **Linux OS Action (The Fix):** The Storage Team must ensure the volume's export policy allows `-superuser sys` (Phase 3.2). Once allowed, the Linux admin mounts the volume as `root` and executes standard UNIX commands (`chmod`, `chown`) to set the correct UID/GID ownership on the target directory.
 >   ```bash
->   vserver security file-directory set -vserver <SVM> -path /<VOL> -security-style unix -permissions 0777
+>   mount -t nfs <SVM_IP>:/<VOL> /mnt/troubleshoot
+>   chown -R 1000:1000 /mnt/troubleshoot
+>   chmod -R 775 /mnt/troubleshoot
 >   ```
-> * **Linux OS Action:** Mount the share as a user with sufficient privileges (usually root) and use standard `chown` and `chmod` commands to correct the UID/GID ownership of the directory.
 
 ---
 
@@ -286,3 +294,18 @@ Look at the `Reason` column. It will explicitly tell you the failure point. Dele
 ```bash
 vserver security trace filter delete -vserver <SVM> -index 1
 ```
+
+---
+
+<a id="phase-7"></a>
+## 📚 Phase 7: Official NetApp Documentation Reference
+*Below are the verified ONTAP 9 official documentation links for the diagnostic commands utilized in this SOP.*
+
+| Command / Protocol | Official NetApp Documentation Reference |
+| :--- | :--- |
+| `network interface` & `network route` | [ONTAP 9 Network Management Guide](https://docs.netapp.com/us-en/ontap/network-management/index.html) |
+| `vserver nfs show` / `modify` | [Docs: vserver nfs commands](https://docs.netapp.com/us-en/ontap-cli/vserver-nfs-show.html) |
+| `volume show` / `online` | [Docs: volume commands](https://docs.netapp.com/us-en/ontap-cli/volume-show.html) |
+| `vserver export-policy rule` | [Docs: vserver export-policy rule create](https://docs.netapp.com/us-en/ontap-cli/vserver-export-policy-rule-create.html) |
+| `vserver security file-directory show` | [Docs: vserver security file-directory](https://docs.netapp.com/us-en/ontap-cli/vserver-security-file-directory-show.html) |
+| `vserver security trace` | [Docs: vserver security trace filter create](https://docs.netapp.com/us-en/ontap-cli/vserver-security-trace-filter-create.html) |
