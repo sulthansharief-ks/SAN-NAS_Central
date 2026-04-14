@@ -4,12 +4,27 @@
 
 ---
 
-## **1. Purpose 🎯**
+## **Table of Contents 📑**
+* [1. Purpose 🎯](#1-purpose)
+* [2. Key Metrics to Capture 📊](#2-key-metrics-to-capture)
+* [3. Procedure A: Using Hitachi Ops Center Analyzer (Best Practice) 🚀](#3-procedure-a-using-hitachi-ops-center-analyzer)
+    * [Step 1: Access the Capacity Dashboard](#step-1-access-the-capacity-dashboard)
+    * [Step 2: Generate the Array-Level Report](#step-2-generate-the-array-level-report)
+    * [Step 3: Review the "Zero Space" Forecast (Crucial for Management)](#step-3-review-the-zero-space-forecast)
+* [4. Procedure B: Using Storage Navigator (Manual Fallback) 🛠️](#4-procedure-b-using-storage-navigator)
+    * [Step 1: Export Array-Level Capacity](#step-1-export-array-level-capacity)
+    * [Step 2: Export DP Pool Utilization](#step-2-export-dp-pool-utilization)
+    * [Step 3: Excel Aggregation & Formatting](#step-3-excel-aggregation-formatting)
+* [5. Structuring the Final Report (Email/Presentation format) ✉️](#5-structuring-the-final-report)
+
+---
+
+## <a id="1-purpose"></a>**1. Purpose 🎯**
 The Monthly Storage Capacity Report is a critical deliverable for IT leadership. It provides a macro-level view of storage utilization across the entire data center, tracks the effectiveness of Data Reduction (compression/deduplication), and serves as the primary data point for forecasting future hardware purchases before DP Pools hit their depletion thresholds.
 
 ---
 
-## **2. Key Metrics to Capture 📊**
+## <a id="2-key-metrics-to-capture"></a>**2. Key Metrics to Capture 📊**
 Management does not usually need to see individual LUN sizes. Your monthly report should aggregate the following data points per array:
 1. **Total Physical Usable Capacity:** The total usable hardware capacity after RAID overhead.
 2. **Total Allocated Capacity (Physical Used):** The actual hardware footprint consumed by data.
@@ -20,36 +35,36 @@ Management does not usually need to see individual LUN sizes. Your monthly repor
 
 ---
 
-## **3. Procedure A: Using Hitachi Ops Center Analyzer (Best Practice) 🚀**
+## <a id="3-procedure-a-using-hitachi-ops-center-analyzer"></a>**3. Procedure A: Using Hitachi Ops Center Analyzer (Best Practice) 🚀**
 *Hitachi Ops Center Analyzer is purpose-built for this task and can automate the entire process using its predictive analytics engine.*
 
-### **Step 1: Access the Capacity Dashboard**
+### <a id="step-1-access-the-capacity-dashboard"></a>**Step 1: Access the Capacity Dashboard**
 1. Log in to **Hitachi Ops Center Analyzer**.
 2. On the main dashboard, navigate to the **Capacity** tab.
 3. Here, you will see a fleet-wide overview of all connected VSP arrays. 
 
-### **Step 2: Generate the Array-Level Report**
+### <a id="step-2-generate-the-array-level-report"></a>**Step 2: Generate the Array-Level Report**
 1. Click on **Storage Systems** in the left-hand menu.
 2. Click the **Export** icon (downward arrow).
 3. Select **Capacity Report**. Ops Center will generate a comprehensive CSV/PDF detailing the Total, Used, and Free capacity for every array in your environment, including the Data Reduction ratios.
 
-### **Step 3: Review the "Zero Space" Forecast (Crucial for Management)**
+### <a id="step-3-review-the-zero-space-forecast"></a>**Step 3: Review the "Zero Space" Forecast (Crucial for Management)**
 1. In Ops Center Analyzer, navigate to **Analytics** > **Capacity Forecast**.
 2. Ops Center uses AI to analyze the last 30-90 days of consumption and projects exactly when each array will hit 100% full.
 3. Take a screenshot or export this forecast graph. *This is the most important piece of data for the monthly report, as it dictates the procurement budget.*
 
 ---
 
-## **4. Procedure B: Using Storage Navigator (Manual Fallback) 🛠️**
+## <a id="4-procedure-b-using-storage-navigator"></a>**4. Procedure B: Using Storage Navigator (Manual Fallback) 🛠️**
 *If Ops Center is unavailable, you must manually pull pool data directly from the SVP of each array and aggregate it in Excel.*
 
-### **Step 1: Export Array-Level Capacity**
+### <a id="step-1-export-array-level-capacity"></a>**Step 1: Export Array-Level Capacity**
 1. Log in to **Storage Navigator**.
 2. In the left tree, select the top-level **Storage Systems** icon.
 3. The main pane will display the **Summary** tab showing Total Capacity, Free Capacity, and Saving Effect (Data Reduction).
 4. Take a screenshot or manually record these top-level numbers for your executive summary.
 
-### **Step 2: Export DP Pool Utilization**
+### <a id="step-2-export-dp-pool-utilization"></a>**Step 2: Export DP Pool Utilization**
 1. Navigate to **Storage Systems** > **Pools**.
 2. Click the **Column Settings** grid and ensure you have enabled:
    * **Pool Name**
@@ -60,7 +75,7 @@ Management does not usually need to see individual LUN sizes. Your monthly repor
 3. In the bottom right corner, click **More Actions** > **Export**.
 4. Download the `.csv` file.
 
-### **Step 3: Excel Aggregation & Formatting 📈**
+### <a id="step-3-excel-aggregation-formatting"></a>**Step 3: Excel Aggregation & Formatting 📈**
 1. Open the CSV in Excel.
 2. Add a new column titled **"Physical % Full"**. Use the formula: `=(Pool Used Capacity / Total Capacity) * 100`.
 3. Apply Conditional Formatting to this new column:
@@ -71,7 +86,7 @@ Management does not usually need to see individual LUN sizes. Your monthly repor
 
 ---
 
-## **5. Structuring the Final Report (Email/Presentation format) ✉️**
+## <a id="5-structuring-the-final-report"></a>**5. Structuring the Final Report (Email/Presentation format) ✉️**
 When distributing the report to leadership, always lead with an Executive Summary before attaching the Excel data.
 
 **Example Executive Summary Template:**
