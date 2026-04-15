@@ -78,6 +78,8 @@ storage aggregate show-space
 
 # Check real-time disk and CPU utilization (refreshing every 1 second)
 node run -node <NODE> -command sysstat -x 1
+
+statistics node show -node <NODE> -interval 1 -iterations 60
 ```
 
 > **🛠️ Action to Take (If Storage is Bottlenecking):**
