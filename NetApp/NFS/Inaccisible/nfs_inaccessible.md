@@ -176,6 +176,8 @@ vserver export-policy rule show -vserver <SVM> -policyname <ROOT_POLICY_NAME>
 > * **Add a read-only traversal rule:**
 >   ```bash
 >   vserver export-policy rule create -vserver <SVM> -policyname <ROOT_POLICY_NAME> -ruleindex 1 -clientmatch 0.0.0.0/0 -rorule any -rwrule none -protocol nfs
+>   or
+>   vserver export-policy rule create -vserver <SVM> -policyname <ROOT_POLICY> -ruleindex 1 -protocol nfs -clientmatch 0.0.0.0/0 -rorule sys -rwrule never -superuser none
 >   ```
 
 ### 3.2 Verify the Target Volume / Qtree Export Policy
