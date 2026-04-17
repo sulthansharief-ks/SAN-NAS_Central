@@ -19,6 +19,7 @@ When things break, troubleshooting shifts from a **Single Person (NetApp Admin)*
    * [👁️ Phase 3: Switch Visibility (CDP/LLDP)](#phase-3)
    * [🔗 Phase 4: Interface Group (LACP) Validation](#phase-4)
    * [🛠️ Phase 5: Remediation & Isolation Steps](#phase-5)
+3. [📚 Part 3: Official NetApp Documentation Reference](#references)
 
 ---
 
@@ -143,13 +144,12 @@ network port show -node <node_name> -port <port_name>
 
 <a id="phase-2"></a>
 ### 📊 Phase 2: Layer 1 Health & Error Counters
-*If the link is "up" but performance is terrible or packets are dropping, you must check the physical interface counters for CRC errors and frame drops.*
+*If the link is "up" but performance is terrible or packets are dropping, you must check the physical interface counters for CRC errors and frame drops. (Note: Utilizing `network port statistics show` is the ONTAP 9 best practice for polling these counters).*
 
-**View detailed port statistics:**
+**View detailed port error statistics:**
 ```bash
-network port show -node <node_name> -port <port_name> -instance
+network port statistics show -node <node_name> -port <port_name>
 ```
-*(Scroll down in the output to the MAC/Hardware statistics section)*
 
 > **🛠️ Action to Take (Based on Error Counters):**
 > * **If `CRC Errors` are incrementing:**
@@ -211,16 +211,13 @@ network port modify -node <node_name> -port <port_name> -up-admin true
 ```
 
 **Step 2: SFP / Optical Power Verification (Advanced) 🔦**
-If you suspect the SFP (transceiver) is dying, pull the raw hardware data to check optical transmit/receive power levels using the advanced node shell.
+If you suspect the SFP (transceiver) is dying, you can poll the raw hardware data via the nodeshell to check optical transmit/receive power levels.
 > * 👥 **Responsible Team:** **Storage Team**
 ```bash
-# Enter the node run shell
-system node run -node <node_name>
-
-# Run the physical sysconfig command for the specific slot (e.g., slot 0)
-sysconfig -a 0
+# Run the sysconfig command against the node to view physical hardware states
+node run -node <node_name> -command sysconfig -a
 ```
-*(Look for the specific port and check if it says "SFP Not Present" or shows extremely low Rx/Tx power levels, indicating a bent fiber or dead optic).*
+*(Scan the output for your specific port to see if it reports "SFP Not Present" or shows extremely low Rx/Tx power levels, indicating a bent fiber or dead optic).*
 
 **Step 3: Physical Swap Isolation (The Swap Test) 🔁**
 If the link remains down, perform the swap test to isolate the hardware.
@@ -229,3 +226,18 @@ If the link remains down, perform the swap test to isolate the hardware.
 2. **Swap the Switch Port:** Move the cable to a different port on the upstream switch. If the link comes up, the switch port was dead.
 3. **Swap the SFP (NetApp Side):** If the switch port and cable are proven good, replace the SFP in the NetApp controller. 
 4. **NetApp Motherboard/NIC:** If all above steps fail, the physical NIC or port on the NetApp controller is dead. The **Storage Team** must open a NetApp Support case to dispatch a replacement NIC or controller motherboard.
+
+---
+
+<a id="references"></a>
+## 📚 Part 3: Official NetApp Documentation Reference
+*All commands utilized in this SOP are sourced from the official NetApp ONTAP 9 Documentation Center.*
+
+| Command / Protocol | Official NetApp Documentation Reference |
+| :--- | :--- |
+| `network port show` / `modify` | [Docs: network port commands](https://docs.netapp.com/us-en/ontap-cli/network-port-show.html) |
+| `network port statistics show` | [Docs: network port statistics show](https://docs.netapp.com/us-en/ontap-cli/network-port-statistics-show.html) |
+| `network device-discovery show` | [Docs: network device-discovery show](https://docs.netapp.com/us-en/ontap-cli/network-device-discovery-show.html) |
+| `network port ifgrp show` | [Docs: network port ifgrp commands](https://docs.netapp.com/us-en/ontap-cli/network-port-ifgrp-show.html) |
+| `node run -command sysconfig` | [Docs: system node run](https://docs.netapp.com/us-en/ontap-cli/system-node-run.html) |
+| ONTAP Network Management | [ONTAP 9 Network Management Guide](https://docs.netapp.com/us-en/ontap/network-management/index.html) |
