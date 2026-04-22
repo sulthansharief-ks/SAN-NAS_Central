@@ -1,4 +1,3 @@
-
 # 🔐 NetApp ONTAP: SSL Certificate Lifecycle Management SOP 🚀
 
 SSL certificates for the Cluster Management interface and individual Storage Virtual Machines (SVMs) expire regularly. Failure to renew them breaks API integrations, SnapMirror authentications, Active Directory LDAP over SSL, and ONTAP System Manager GUI access.
@@ -52,11 +51,11 @@ graph TD
     Bind --> Clean
 
     linkStyle 0,1,2,3,4,5,6,7 stroke:#8b949e,stroke-width:2px
-````
+```
 
------
+---
 
-\<a id="phase-1"\>\</a\>
+<a id="phase-1"></a>
 
 ## 🕵️ Phase 1: Audit & Identify Expiring Certificates
 
@@ -72,9 +71,9 @@ graph TD
 >     ```
 >   * **Note:** Record the `serial` number of the expiring certificate. You will need it for Phase 4.
 
------
+---
 
-\<a id="phase-2a"\>\</a\>
+<a id="phase-2a"></a>
 
 ## 🏗️ Phase 2A: The Self-Signed Renewal Process
 
@@ -94,9 +93,9 @@ ONTAP will generate the private key and the public certificate simultaneously.
 >     ```
 >   * **Output:** The CLI will display the `serial` number of the newly created certificate. **Write this down.** Skip to **Phase 3**.
 
------
+---
 
-\<a id="phase-2b"\>\</a\>
+<a id="phase-2b"></a>
 
 ## 🏛️ Phase 2B: The Trusted CA Renewal Process (CSR)
 
@@ -145,9 +144,9 @@ You must install the CA chain *before* installing the server certificate.
 >   * **Action:** Paste the Base64 Server Certificate text when prompted. ONTAP will automatically marry this certificate to the hidden private key generated in Step 2B.1.
 >   * **Output:** The CLI will output the new `serial` number. **Write this down.**
 
------
+---
 
-\<a id="phase-3"\>\</a\>
+<a id="phase-3"></a>
 
 ## 🔗 Phase 3: Bind the New Certificate to SSL
 
@@ -163,9 +162,9 @@ You must install the CA chain *before* installing the server certificate.
 >     ```
 >   * **Impact:** Existing active CIFS/NFS connections are **not** disrupted. However, any open REST API sessions or System Manager GUI web browsers will instantly drop and require a page refresh/re-authentication.
 
------
+---
 
-\<a id="phase-4"\>\</a\>
+<a id="phase-4"></a>
 
 ## 🗑️ Phase 4: Post-Renewal Cleanup
 
@@ -178,17 +177,14 @@ You must install the CA chain *before* installing the server certificate.
 >     ```bash
 >     # Verify the old certificate is no longer in use
 >     security certificate show -vserver <SVM_Name> -serial <OLD_Serial_Number>
+>     
+>     # Delete the old expired certificate
+>     security certificate delete -vserver <SVM_Name> -common-name <FQDN_or_IP> -serial <OLD_Serial_Number> -type server
 >     ```
 
-> ````
-> # Delete the old expired certificate
-> security certificate delete -vserver <SVM_Name> -common-name <FQDN_or_IP> -serial <OLD_Serial_Number> -type server
-> ```
-> ````
+---
 
------
-
-\<a id="references"\>\</a\>
+<a id="references"></a>
 
 ## 📚 Phase 5: Official NetApp Documentation Reference
 
@@ -197,9 +193,7 @@ You must install the CA chain *before* installing the server certificate.
 | Task | Official NetApp Documentation Reference |
 | :--- | :--- |
 | **Audit Certificates** | [Docs: security certificate show](https://docs.netapp.com/us-en/ontap-cli/security-certificate-show.html) |
-| **Generate Self-Signed** | [Docs: security certificate generate-self-signed](https://www.google.com/search?q=https://docs.netapp.com/us-en/ontap-cli/security-certificate-generate-self-signed.html) |
+| **Generate Self-Signed** | [Docs: security certificate generate-self-signed](https://docs.netapp.com/us-en/ontap-cli/security-certificate-generate-self-signed.html) |
 | **Generate CSR** | [Docs: security certificate generate-csr](https://docs.netapp.com/us-en/ontap-cli/security-certificate-generate-csr.html) |
 | **Install Certificate** | [Docs: security certificate install](https://docs.netapp.com/us-en/ontap-cli/security-certificate-install.html) |
 | **Bind SSL / Modify** | [Docs: security ssl modify](https://docs.netapp.com/us-en/ontap-cli/security-ssl-modify.html) |
-
-```
