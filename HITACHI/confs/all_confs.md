@@ -5,24 +5,26 @@
 ---
 
 ## **Table of Contents 📑**
-* [1. Configuring Storage System Name & SVP Hostname 🏷️](#1-configuring-storage-system-name--svp-hostname)
-    * [Part A: Changing the Storage System Name](#part-a-changing-the-storage-system-name)
-    * [Part B: Changing the SVP Hostname & Network Settings](#part-b-changing-the-svp-hostname--network-settings)
-* [2. Configuring Syslog Forwarding 📡](#2-configuring-syslog-forwarding)
-* [3. Renewing SSL/TLS Certificates 🔐](#3-renewing-ssltls-certificates)
-    * [Step 1: Generate the CSR (Certificate Signing Request)](#step-1-generate-the-csr-certificate-signing-request)
-    * [Step 2: Install the Signed Certificate](#step-2-install-the-signed-certificate)
-    * [Step 3: Restart Web Services](#step-3-restart-web-services)
+* [1. Configuring Storage System Name & SVP Hostname 🏷️](#section1)
+    * [Part A: Changing the Storage System Name](#part-a)
+    * [Part B: Changing the SVP Hostname & Network Settings](#part-b)
+* [2. Configuring Syslog Forwarding 📡](#section2)
+* [3. Renewing SSL/TLS Certificates 🔐](#section3)
+    * [Step 1: Generate the CSR (Certificate Signing Request)](#step-1)
+    * [Step 2: Install the Signed Certificate](#step-2)
+    * [Step 3: Restart Web Services](#step-3)
 
 ---
 
-## <a id="1-configuring-storage-system-name--svp-hostname"></a>**1. Configuring Storage System Name & SVP Hostname 🏷️**
+<a id="section1"></a>
+## **1. Configuring Storage System Name & SVP Hostname 🏷️**
 
 ### **Purpose 🎯**
 Proper naming conventions are critical for enterprise environments with multiple arrays. This procedure covers updating the logical **Storage System Name** (visible in HDvM-SN and API) and the **SVP Hostname** (the network identity of the Service Processor).
 
 ### **Procedure 🛠️**
 
+<a id="part-a"></a>
 #### **Part A: Changing the Storage System Name**
 1. Log in to the **Maintenance Utility (MU)** using an account with Storage Administrator privileges.
 2. In the left navigation pane, expand **Administration** and select **Storage System**.
@@ -31,6 +33,7 @@ Proper naming conventions are critical for enterprise environments with multiple
 5. *(Optional)* Update the Location or Contact Information fields for better CMDB tracking.
 6. Click **Finish**, review the summary, and click **Apply**. The change is immediate and does not disrupt I/O.
 
+<a id="part-b"></a>
 #### **Part B: Changing the SVP Hostname & Network Settings**
 *Note: Changing the SVP hostname/IP will temporarily drop your web management session.*
 1. In the MU, navigate to **Administration** > **Network Settings**.
@@ -42,7 +45,8 @@ Proper naming conventions are critical for enterprise environments with multiple
 
 ---
 
-## <a id="2-configuring-syslog-forwarding"></a>**2. Configuring Syslog Forwarding 📡**
+<a id="section2"></a>
+## **2. Configuring Syslog Forwarding 📡**
 
 ### **Purpose 🎯**
 To ensure hardware failures (SIMs) and security events (Audit Logs) are centrally monitored, the VSP must forward its logs to a corporate SIEM (e.g., Splunk, QRadar, or a standard Syslog server).
@@ -62,7 +66,8 @@ To ensure hardware failures (SIMs) and security events (Audit Logs) are centrall
 
 ---
 
-## <a id="3-renewing-ssltls-certificates"></a>**3. Renewing SSL/TLS Certificates 🔐**
+<a id="section3"></a>
+## **3. Renewing SSL/TLS Certificates 🔐**
 
 ### **Purpose 🎯**
 By default, the SVP and GUM use self-signed certificates, which trigger security warnings in browsers and fail enterprise vulnerability scans. This procedure outlines how to generate a Certificate Signing Request (CSR) and install a CA-signed SSL/TLS certificate.
@@ -74,6 +79,7 @@ By default, the SVP and GUM use self-signed certificates, which trigger security
 
 ### **Procedure 🛠️**
 
+<a id="step-1"></a>
 #### **Step 1: Generate the CSR (Certificate Signing Request) 📝**
 1. Log in to the **Maintenance Utility (MU)**.
 2. Navigate to **Administration** > **Security** > **SSL/TLS Server Certificate**.
@@ -85,6 +91,7 @@ By default, the SVP and GUM use self-signed certificates, which trigger security
 5. Click **Finish** and **Apply**. 
 6. Once generated, click **Download CSR**. Send this `.csr` text file to your security team to be signed.
 
+<a id="step-2"></a>
 #### **Step 2: Install the Signed Certificate 📥**
 *Do not proceed until your security team returns the signed certificate (usually a `.cer`, `.crt`, or `.pem` file).*
 1. Navigate back to **Administration** > **Security** > **SSL/TLS Server Certificate**.
@@ -93,8 +100,9 @@ By default, the SVP and GUM use self-signed certificates, which trigger security
    * *Important:* Ensure the certificate format matches what Hitachi expects (Base64 encoded X.509). If a chain (Intermediate/Root CA) is required, ensure it is bundled correctly per Hitachi documentation or uploaded in the specific CA chain section of the MU.
 4. Click **Apply**.
 
+<a id="step-3"></a>
 #### **Step 3: Restart Web Services 🔄**
 1. A warning will appear stating that the SVP web services must be restarted for the new certificate to take effect.
 2. Acknowledge the prompt. The SVP Tomcat services will restart.
 3. Wait 10 minutes, then navigate to the SVP's FQDN in your browser (`https://vsp01.yourdomain.local`). 
-4. Verify the browser padlock icon shows a secure connection with your corporate CA details.
+4. Verify the browser padlock icon shows a secure connection with your corporate CA details. 
