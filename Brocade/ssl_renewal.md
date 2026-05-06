@@ -2,6 +2,9 @@
 
 Here are the exact steps to renew your expiring SSL certificate on your Brocade switch (`10.1.1.12`). To clarify, Brocade FOS requires generating a *new* certificate to replace the expiring one. 
 
+
+https://techdocs.broadcom.com/us/en/fibre-channel-networking/fabric-os/fabric-os-commands/9-2-x/Fabric-OS-Commands/secCertMgmt_922.html
+
 Choose the path that fits your company's security policy! 👇
 
 ---
