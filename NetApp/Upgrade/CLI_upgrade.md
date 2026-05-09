@@ -279,4 +279,4 @@ cluster image resume-update
 | **Troubleshoot Vetoes** | [Docs: Takeover and Giveback Vetoes](https://www.google.com/search?q=https://docs.netapp.com/us-en/ontap/high-availability/ha_commands_for_troubleshooting_takeover_and_giveback_vetoes.html) |
 | **Freeing Root Space** | [Docs: Free space on the root volume](https://www.google.com/search?q=https://docs.netapp.com/us-en/ontap/upgrade/task_free_space_on_root_vol.html) |
 
-```
+
