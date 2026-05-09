@@ -165,4 +165,4 @@ vserver cifs session close -vserver <SVM_Name> -share <Share_Name>
 | **Revoke / Delete Share ACL** | [Docs: vserver cifs share access-control delete](https://docs.netapp.com/us-en/ontap-cli/vserver-cifs-share-access-control-delete.html) |
 | **Close CIFS Sessions** | [Docs: vserver cifs session close](https://docs.netapp.com/us-en/ontap-cli/vserver-cifs-session-close.html) |
 
-```
+
