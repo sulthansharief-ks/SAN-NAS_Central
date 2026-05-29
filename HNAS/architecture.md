@@ -8,65 +8,75 @@ Here is the detailed architectural breakdown of HNAS terminologies, structured f
 ```mermaid
 graph TD
     %% Styling Definitions
-    classDef network fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#01579b
-    classDef virtual fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#4a148c
-    classDef logical fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#1b5e20
-    classDef physical fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#e65100
     classDef backend fill:#eceff1,stroke:#37474f,stroke-width:2px,color:#37474f
+    classDef pool fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#e65100
+    classDef logical fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#1b5e20
+    classDef server fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#4a148c
+    classDef network fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#01579b
 
-    subgraph Network_Layer [1. Network Layer]
-        Users([End Users / Clients]):::network
+    subgraph Network_Layer [1. Client Access & Network Layer]
+        Clients([SMB / NFS Clients]):::network
         GNS([Global Namespace - GNS]):::network
     end
 
-    subgraph Server_Layer [2. Virtual Server Layer]
-        EVS1[Enterprise Virtual Server - Node 1]:::virtual
-        EVS2[Enterprise Virtual Server - Node 2]:::virtual
+    subgraph Server_Layer [2. Virtual Server Layer - Active/Active HNAS Nodes]
+        EVS1[EVS 1: Finance_Server <br> 192.168.10.50]:::server
+        EVS2[EVS 2: Eng_Server <br> 192.168.10.51]:::server
     end
 
-    subgraph FS_Layer [3. File System Layer]
-        FS1[(File System 1)]:::logical
-        FS2[(File System 2)]:::logical
-        ViVol1[/Virtual Volume A/]:::logical
-        ViVol2[/Virtual Volume B/]:::logical
+    subgraph FS_Layer [3. File System & Quota Layer]
+        FS1[(FS_Finance_Data)]:::logical
+        FS2[(FS_HR_Data)]:::logical
+        FS3[(FS_Engineering)]:::logical
+        
+        VV1[/ViVol: Payroll Quota/]:::logical
+        VV2[/ViVol: Benefits Quota/]:::logical
     end
 
-    subgraph Pool_Layer [4. Storage Pool Layer]
-        Span{Span - Aggregated Storage Pool}:::physical
-        SD1[System Drive 1]:::physical
-        SD2[System Drive 2]:::physical
-        SD3[System Drive 3]:::physical
+    subgraph Pool_Layer [4. Storage Pool Layer - Performance Tiers]
+        Span1{Span 1 - Tier 1 SSD}:::pool
+        Span2{Span 2 - Tier 2 SAS}:::pool
+        
+        SD1[System Drive 01]:::pool
+        SD2[System Drive 02]:::pool
+        SD3[System Drive 03]:::pool
+        SD4[System Drive 04]:::pool
     end
 
-    subgraph SAN_Layer [5. SAN Backend Layer]
-        LUN1[(VSP Block LUN 1)]:::backend
-        LUN2[(VSP Block LUN 2)]:::backend
-        LUN3[(VSP Block LUN 3)]:::backend
+    subgraph SAN_Layer [5. Backend VSP Block Storage]
+        LUN1[(VSP LUN 0001)]:::backend
+        LUN2[(VSP LUN 0002)]:::backend
+        LUN3[(VSP LUN 0003)]:::backend
+        LUN4[(VSP LUN 0004)]:::backend
     end
 
     %% Routing and Connections
-    Users ==>|SMB / NFS Requests| GNS
-    Users -.->|Direct Mount to IP| EVS1
+    Clients ==>|UNC Path / Mount| GNS
+    Clients -.->|Direct IP Mount| EVS1
     
-    GNS -->|Routes to| EVS1
-    GNS -->|Routes to| EVS2
+    GNS -->|Namespace Routing| EVS1
+    GNS -->|Namespace Routing| EVS2
 
-    EVS1 ==>|Owns & Mounts| FS1
-    EVS2 ==>|Owns & Mounts| FS2
+    EVS1 ==>|Mounts & Serves| FS1
+    EVS1 ==>|Mounts & Serves| FS2
+    EVS2 ==>|Mounts & Serves| FS3
 
-    FS1 -->|Contains| ViVol1
-    FS1 -->|Contains| ViVol2
+    FS2 -->|Applies Quota via| VV1
+    FS2 -->|Applies Quota via| VV2
 
-    FS1 ==>|Carved out of| Span
-    FS2 ==>|Carved out of| Span
+    FS1 -.->|Formats Capacity| Span1
+    FS2 -.->|Formats Capacity| Span1
+    FS3 -.->|Formats Capacity| Span2
 
-    Span -->|Stripes Chunks Across| SD1
-    Span -->|Stripes Chunks Across| SD2
-    Span -->|Stripes Chunks Across| SD3
+    Span1 -->|Stripes Data| SD1
+    Span1 -->|Stripes Data| SD2
+    Span2 -->|Stripes Data| SD3
+    Span2 -->|Stripes Data| SD4
 
-    SD1 ===|FC Mapping| LUN1
-    SD2 ===|FC Mapping| LUN2
-    SD3 ===|FC Mapping| LUN3
+    SD1 ===|FC Path| LUN1
+    SD2 ===|FC Path| LUN2
+    SD3 ===|FC Path| LUN3
+    SD4 ===|FC Path| LUN4
 ```
 
 ---
