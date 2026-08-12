@@ -1,0 +1,406 @@
+gbnl3u05.gb.tntpost.com
+
+N_Port Node World Wide Name = 0x50060b00001d37e1
+N_Port Port World Wide Name = 0x50060b00001d37e0
+Switch Port World Wide Name = 0x200e00051e0368cf
+Switch Node World Wide Name = 0x100000051e0368cf
+
+N_Port Node World Wide Name = 0x50060b00001d37e3
+N_Port Port World Wide Name = 0x50060b00001d37e2
+Switch Port World Wide Name = 0x200e00051e036912
+Switch Node World Wide Name = 0x100000051e036912
+
+gbahess7.gb.tntpost.com
+
+gbahess8.gb.tntpost.com
+
+
+
+
+Array:UKAH3P74009267
+
+switch:gbahess7
+alias: UKAH3P74009267_N2S1P1
+                22:11:00:02:ac:01:5c:b3
+alias: UKAH3P74009267_N3S1P1
+                23:11:00:02:ac:01:5c:b3
+alias: UKAH3P74009267_N3S1P2
+                23:12:00:02:ac:01:5c:b3
+
+switch:gbahess8
+alias: UKAH3P74009267_N3S1P1
+                23:11:00:02:ac:01:5c:b3
+
+
+ukwympc00390-b.gb.tntpost.com_1642257847
+
+
+
+
+
+bpexpdate -d <future date> -backupid <backupid>
+
+
+
+
+
+50:06:0b:00:00:22:39:74
+50:06:0b:00:00:23:f5:54
+
+
+
+
+
+
+ zone:  ukwyhyv0058_HBA1_UKWY3P74003329_N2S1P1
+                51:40:2e:c0:00:00:11:a8
+                22:11:00:02:ac:00:d0:51
+ zone:  ukwyhyv0058_HBA1_UKWY3P74003329_N3S1P1
+                51:40:2e:c0:00:00:11:a8
+                23:11:00:02:ac:00:d0:51
+ zone:  ukwyhyv0058_HBA1_UKWY3P74007343_N0S1P2
+                51:40:2e:c0:00:00:11:a8
+                20:12:00:02:ac:01:55:2f
+ zone:  ukwyhyv0058_HBA1_UKWY3P74007343_N1S1P2
+                51:40:2e:c0:00:00:11:a8
+                21:12:00:02:ac:01:55:2f
+
+
+
+
+
+Creating zone Brocade
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+alicreate "Servername_HBA00","server wwpn"
+zonecreate "zone_name","server_alias;storage_alias"
+cfgadd "SE9990_A","Zone_name"
+cfgsave
+cfgenable SE9990_A
+
+
+
+
+
+alicreate "cnshau02_HBA01","50:06:0b:00:00:22:5e:50"
+zonecreate "cnshau02_HBA01_UKAH3P74009267_N3S1P1","cnshau02_HBA01;UKAH3P74009267_N3S1P1"
+cfgadd "Switch_2","cnshau02_HBA01_UKAH3P74009267_N3S1P1"
+cfgsave
+cfgenable Switch_2
+
+
+
+
+
+51:40:2e:c0:00:00:11:ac
+51:40:2e:c0:00:00:11:ae
+
+
+N2-UKWY3P74003329_N2S1P1
+
+alicreate "UKWYHYV0059_HBA1","51:40:2e:c0:00:00:11:ac"
+zonecreate "UKWYHYV0059_HBA1_UKWY3P74003329_N2S1P1","UKWYHYV0059_HBA1;UKWY3P74003329_N2S1P1"
+cfgadd "UKWYSWSAN001A_CFG","UKWYHYV0059_HBA1_UKWY3P74003329_N2S1P1"
+cfgsave
+cfgenable UKWYSWSAN001A_CFG
+
+
+
+
+zonecreate "UKWYHYV0059_HBA1_UKWY3P74003329_N3S1P1","UKWYHYV0059_HBA1;UKWY3P74003329_N3S1P1"
+cfgadd "UKWYSWSAN001A_CFG","UKWYHYV0059_HBA1_UKWY3P74003329_N3S1P1"
+cfgsave
+cfgenable UKWYSWSAN001A_CFG
+
+
+zonecreate "UKWYHYV0059_HBA1_UKWY3P74007343_N0S1P2","UKWYHYV0059_HBA1;UKWY3P74007343_N0S1P2"
+cfgadd "UKWYSWSAN001A_CFG","UKWYHYV0059_HBA1_UKWY3P74007343_N0S1P2"
+cfgsave
+cfgenable UKWYSWSAN001A_CFG
+
+
+zonecreate "UKWYHYV0059_HBA1_UKWY3P74007343_N1S1P2","UKWYHYV0059_HBA1;UKWY3P74007343_N1S1P2"
+cfgadd "UKWYSWSAN001A_CFG","UKWYHYV0059_HBA1_UKWY3P74007343_N1S1P2"
+cfgsave
+cfgenable UKWYSWSAN001A_CFG
+
+--------------------------------------------------------------------------------------------------------
+zone:  ukwyhyv0058_HBA2_UKWY3P74003329_N2S1P2
+                51:40:2e:c0:00:00:11:aa
+                22:12:00:02:ac:00:d0:51
+ zone:  ukwyhyv0058_HBA2_UKWY3P74003329_N3S1P2
+                51:40:2e:c0:00:00:11:aa
+                23:12:00:02:ac:00:d0:51
+ zone:  ukwyhyv0058_HBA2_UKWY3P74007343_N0S1P1
+                51:40:2e:c0:00:00:11:aa
+                20:11:00:02:ac:01:55:2f
+ zone:  ukwyhyv0058_HBA2_UKWY3P74007343_N1S1P1
+                51:40:2e:c0:00:00:11:aa
+                21:11:00:02:ac:01:55:2f
+
+
+alicreate "UKWYHYV0059_HBA2","51:40:2e:c0:00:00:11:ae"
+zonecreate "UKWYHYV0059_HBA2_UKWY3P74003329_N2S1P2","UKWYHYV0059_HBA2;UKWY3P74003329_N2S1P2"
+cfgadd "UKWYSWSAN001B_CFG","UKWYHYV0059_HBA2_UKWY3P74003329_N2S1P2"
+cfgsave
+cfgenable UKWYSWSAN001B_CFG
+
+
+zonecreate "UKWYHYV0059_HBA2_UKWY3P74003329_N3S1P2","UKWYHYV0059_HBA2;UKWY3P74003329_N3S1P2"
+cfgadd "UKWYSWSAN001B_CFG","UKWYHYV0059_HBA2_UKWY3P74003329_N3S1P2"
+cfgsave
+cfgenable UKWYSWSAN001B_CFG
+
+
+zonecreate "UKWYHYV0059_HBA2_UKWY3P74007343_N0S1P1","UKWYHYV0059_HBA2;UKWY3P74007343_N0S1P1"
+cfgadd "UKWYSWSAN001B_CFG","UKWYHYV0059_HBA2_UKWY3P74007343_N0S1P1"
+cfgsave
+cfgenable UKWYSWSAN001B_CFG
+
+
+zonecreate "UKWYHYV0059_HBA2_UKWY3P74007343_N1S1P1","UKWYHYV0059_HBA2;UKWY3P74007343_N1S1P1"
+cfgadd "UKWYSWSAN001B_CFG","UKWYHYV0059_HBA2_UKWY3P74007343_N1S1P1"
+cfgsave
+cfgenable UKWYSWSAN001B_CFG
+
+------------------------->
+
+
+
+ zone:  UKWYHYV0059_HBA1_UKWY3P74007343_N0S1P2
+                51:40:2e:c0:00:00:11:ac
+                20:12:00:02:ac:01:55:2f
+ zone:  UKWYHYV0059_HBA1_UKWY3P74007343_N1S1P2
+                51:40:2e:c0:00:00:11:ac
+                21:12:00:02:ac:01:55:2f
+
+
+
+cfgremove "UKWYSWSAN001A_CFG","UKWYHYV0059_HBA1_UKWY3P74007343_N1S1P2"
+cfgsave
+cfgenable UKWYSWSAN001A_CFG
+
+cfgremove "UKWYSWSAN001B_CFG","UKWYHYV0059_HBA2_UKWY3P74007343_N1S1P1"
+cfgsave
+cfgenable UKWYSWSAN001B_CFG
+
+
+cfgremove "UKWYSWSAN001B_CFG","UKWYHYV0059_HBA2_UKWY3P74007343_N0S1P1"
+cfgsave
+cfgenable UKWYSWSAN001B_CFG
+
+
+cfgremove "UKWYSWSAN001A_CFG","UKWYHYV0060_HBA1_UKWY3P74003329_N2S1P1"
+cfgsave
+cfgenable UKWYSWSAN001A_CFG
+
+
+Deleting existing Zone
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+1.First remove zone members from the zone.
+
+zoneremove "zone_name","host_alias","storage_alias"
+cfgsave
+cfgenable testfcsw1_cfg
+
+
+2.Remove zone from effective configuration and delete.
+
+cfgremove "testfcsw1_cfg","Zone_name"
+zonedelete "Zone_name"
+cfgsave
+cfgenable testfcsw1_cfg
+
+
+3.delete host alias
+alidelete “host_alias”
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Removing zone from effective conf and delete
+--------------------------------------------
+
+cfgremove "SE9990_B","TNTUKDW_HBA10_VMAX_1D5"
+zonedelete "TNTUKDW_HBA10_VMAX_1D5"
+cfgsave
+cfgenable SE9990_B
+
+alidelete “tntukdw_hba10”
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+Removing members from zone(tntukdw_hba10,VMAX_1D5 are the members)
+---------------------------------
+zoneremove "TNTUKDW_HBA10_VMAX_1D5","tntukdw_hba10,VMAX_1D5"
+cfgsave
+cfgenable SE9990_B
+
+
+
+
+zone-2
+
+Removing members from zone
+
+zoneremove "TNTUKDW_VMAX","tntukdw_hba10,VMAX_1D5"
+cfgsave
+cfgenable SE9990_B
+
+
+Removing zone from effective conf and delete
+
+cfgremove "SE9990_B","TNTUKDW_VMAX"
+zonedelete "TNTUKDW_VMAX"
+cfgsave
+cfgenable SE9990_B
+
+
+Deleting alias
+
+alidelete “tntukdw_hba10”----Already deleted/no need.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Switch 18
+
+
+zone-1 deletion
+
+1.First remove zone members from the zone.
+
+zoneremove "TNTUKDW_VMAX","TNTUKDW_HBA00,VMAX_4D5"
+cfgsave
+cfgenable SE9990_A
+
+
+2.Remove zone from effective configuration and delete.
+
+cfgremove "SE9990_A","TNTUKDW_VMAX"
+zonedelete "TNTUKDW_VMAX"
+cfgsave
+cfgenable SE9990_A
+
+
+3.delete host alias
+alidelete “TNTUKDW_HBA00”
+
+
+zone-2 deletion
+
+1.First remove zone members from the zone.
+
+zoneremove "TNTUKDW_VMAX","TNTUKDW_HBA00,VMAX_4D5"
+cfgsave
+cfgenable SE9990_A
+
+
+2.Remove zone from effective configuration and delete.
+
+cfgremove "SE9990_A","TNTUKDW_VMAX"
+zonedelete "TNTUKDW_VMAX"
+cfgsave
+cfgenable SE9990_A
+
+
+3.delete host alias
+alidelete “TNTUKDW_HBA00”----alredy deleted.
+
+
+
+gbaheitds01-dmz.ics.express.tnt-37.32TB Allocated
+HKGAATP2000.cx.tnt.com-6.9TB used capacity
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+gbahess19.gb.tntpost.com
+
+zone-1
+
+cfgremove "SE9990_B","TNTUKDW_HBA10_VMAX_1D5"
+zonedelete “TNTUKDW_HBA10_VMAX_1D5”
+alidelete “TNTUKDW_HBA10”
+cfgsave
+cfgenable “SE9990_B”
+
+zone-2
+
+cfgremove "SE9990_B","TNTUKDW_VMAX"
+zonedelete “TNTUKDW_VMAX”
+cfgsave
+cfgenable “SE9990_B”
+
+
+
+
+alidelete “TNTUKDW_HBA00”
+
+
+gbahess18.gb.tntpost.com
+
+zone-1
+
+cfgremove "SE9990_A","TNTUKDW_VMAX;TNTUKDW_HBA00_VMAX_4D5"
+zonedelete “TNTUKDW_VMAX;TNTUKDW_HBA00_VMAX_4D5”
+cfgsave
+cfgenable “SE9990_A”
+
+zone-2
+
+
+
+====================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+Cisco Zoning
+
+Step1:Adding ports under vsan
+
+switch# config t----------------------> First Enter config t mode.
+switch(config)# vsan database--------->From config mode,Next enter into vsan database folder.
+switch(config-vsan-db)#
+switch(config-vsan-db)# vsan 1618----->Now Enter inside vsan which we need to add ports.
+vsan 1618 interface fc1/46------------>Now add port into vsan
+exit---------------------------------->Exit after adding port
+
+
+Now you're in config mode.
+
+
+Step2:Creating alias name for server wwpn's
+
+# config t
+(config)# device-alias database-------------------------------------------------------->From config mode get into device-alias database folder.
+(config-device-alias-db)# device-alias name ukcccl915_01 pwwn 10:00:70:10:6f:e8:4f:26-->Now you're in "device-alias database", now create alias for server port
+(config-device-alias-db)# exit---------->exit from device-alias database mode.
+(config)#device-alias distribute ####--------------------------------------------------->From config mode make announce as alias created with this command
+(config)# device-alias commit----------------------------------------------------------->Now commit the device-alias.
+(config)# exit--------------------------------------------------------------------------->Now exit from config mode also.
+
+
+Step3: Create zone name and add members to it.
+
+ALL the below steps to be executed in config mode.
+
+config t
+zone name z_ukcccl915_01_VMAX1102_2D5 vsan 1618---------->creating zone name under desired vsan.
+member device-alias ukcccl915_01------------------------->Now we are under the zone adding server alias to zone(which we created in previous step).
+member device-alias VMAX1102_2D5------------------------->Adding storage alias to zone.
+exit
+
+
+Step4: Re-Activate the vsan now make new zone effective.
+
+ZS_gbahemds02_Prod_1618_20180615 vsan----get this vsan info with the help of command "sh zoneset active | incl zoneset"
+
+
+zoneset activate name ZS_gbahemds02_Prod_1618_20180615 vsan 1618----------->activating the vsan.
+zoneset distribute full vsan 1618------------------------------------------>distributing the vsan
+copy running-config startup-config----------->i also dont know why to execute this but have to do.
+
+
+

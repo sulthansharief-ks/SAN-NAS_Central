@@ -1,0 +1,106 @@
+
+Usefull commands link
+
+https://emcstorageblog.blogspot.com/2014/09/useful-brocade-switch-cli-commands.html
+
+
+ISL configuration:
+https://library.netapp.com/ecmdocs/ECMP1636017/html/GUID-B2BBB025-02A9-442C-9910-00FEF253CE52.html
+
+for any brocade command syntax:
+https://techdocs.broadcom.com/us/en/fibre-channel-networking/fabric-os/fabric-os-commands/9-1-x/Fabric-OS-Commands/aliDelete.html
+
+
+for any brocade error codes
+https://techdocs.broadcom.com/us/en/fibre-channel-networking/fabric-os/fabric-os-messages/9-1-x/fabric-os-system-messages/c3-messages/c3-1014.html
+
+Brocade terminologies
+http://emmanuel.iffly.free.fr/doku.php?id=storage:brocade_pb#:~:text=Disc%20c3%3A%20Discard%20class%203,reporting%20that%20a%20discard%20occurred.
+
+Trobleshooting
+https://support.hpe.com/hpesc/public/docDisplay?docId=mmr_kc-0116195
+
+CRC errors
+https://www.ibm.com/support/pages/how-find-source-crcs-brocade-san#:~:text=Brocade%20switches%20will%20detect%20if%20a%20frame%20has,denote%20that%20the%20frame%20contains%20a%20CRC%20error.
+
+RX and TX power
+https://www.rcannings.com/sfpshow-fault-finding-on-brocade-fibre-channel-switches/
+
+
+
+Above parameters explained:
+• enc_out - Number of encoding error outside of frames received (Rx).
+• crc err - Number of frames with CRC errors received (Rx).
+• Lr_in - Link reset in (primitive sequence), does not apply to FL_Port.
+• Lr_out - Link reset out (primitive sequence), does not apply to FL_Port.
+• Ols_in - Offline reset in (primitive sequence), does not apply to FL_Port.
+• Ols_out - Offline reset out (primitive sequence), does not apply to FL_Port.
+
+Zone Creation Procedure
+============================================================================
+
+alicreate "Servername_HBA00","server wwpn"
+zonecreate "zone_name","server_alias;storage_alias"
+cfgadd "SE9990_A","Zone_name"
+cfgsave
+cfgenable SE9990_A
+
+
+
+
+Deleting existing Zone
+=============================================================================
+1.Move zone to defined configuration and remove zone members from the zone.
+
+ 
+cfgremove "cfgname","Zone_name"
+zoneremove "zone_name","host_alias;storage_alias"
+cfgsave
+cfgenable cfgname
+
+ 
+
+
+2. delete zone.
+
+zonedelete "Zone_name"
+cfgsave
+cfgenable cfgname
+
+ 
+
+3.delete host alias
+alidelete “host_alias”
+
+
+
+
+
+HBA replacements/Same procedure for alias renaming also
+=================================================================================
+
+1.first remove zone from effective conf
+cfgremove "testfcsw1_cfg","Zone_name"
+
+2.Removing old alias from zone
+aliRemove "Zone_name","old_alias/WWPN"
+
+3.Deleting old alias which we removed
+alidelete "old_server_alias"
+
+4.creating new alias with new wwpn
+alicreate "server_name","new_WWPN"
+
+5.adding new alias to zone
+aliadd "zone_name","server_name"
+
+
+cfgadd "SE9990_A","Zone_name"
+cfgsave
+cfgenable SE9990_A
+
+
+
+
+
+

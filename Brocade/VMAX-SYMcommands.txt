@@ -1,0 +1,28 @@
+1.symcfg list
+To list out configured arrays in the server
+
+Creating host 
+
+1.Creating initiator group called Host1 by adding the specified wwn
+
+symaccess -sid 1234 -type initiator -name Host1 create -wwn 1000000000000001
+
+To be changed:1234,Host1,1000000000000001
+
+
+
+2.Adding another HBA WWN to the existing Initiator group(IG) "Host1"
+
+symaccess -sid 1234 -type initiator -name Host1 add -wwn 1000000000000002
+
+To be changed:1234,Host1,1000000000000001
+
+
+3.Rename the Initiator Gorup Host1 as Host2
+symaccess -sid 1234 -type initiator -name Host1 rename -new_name Host2
+
+
+Related to volumes
+
+1.
+symaccess -sid 1234 -type storage -name Host1 add devs AAA:AAB

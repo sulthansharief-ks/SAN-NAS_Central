@@ -1,0 +1,92 @@
+This about TCP port status checking in brocade switch
+
+Lets disable port 23 port in ipv4 policy.
+
+1.ipfilter --show
+=================================================
+
+
+GBAHESS43:FID128:admin> ipfilter --show
+
+Name: default_ipv4, Type: ipv4, State: active
+Rule    Source IP                               Protocol   Dest Port   Action
+1     any                                            tcp       22     permit
+2     any                                            tcp       23     permit
+3     any                                            tcp      897     permit
+4     any                                            tcp      898     permit
+5     any                                            tcp      111     permit
+6     any                                            tcp       80     permit
+7     any                                            tcp      443     permit
+8     any                                            udp      161     permit
+9     any                                            udp      111     permit
+10    any                                            udp      123     permit
+11    any                                            tcp      600 - 1023     permit
+12    any                                            udp      600 - 1023     permit
+
+Name: default_ipv6, Type: ipv6, State: active
+Rule    Source IP                               Protocol   Dest Port   Action
+1     any                                            tcp       22     permit
+2     any                                            tcp       23     permit
+3     any                                            tcp      897     permit
+4     any                                            tcp      898     permit
+5     any                                            tcp      111     permit
+6     any                                            tcp       80     permit
+7     any                                            tcp      443     permit
+8     any                                            udp      161     permit
+9     any                                            udp      111     permit
+10    any                                            udp      123     permit
+11    any                                            tcp      600 - 1023     permit
+12    any                                            udp      600 - 1023     permit
+
+
+
+there are two policies by default:
+-ipv4
+-ipv6
+we cant edit or delete these polices, these contain permitted and denied port details.
+At one time only 1 ipv4 and 1 ipv6 policy can be active, 2 ipv4 policies can be active at a same time.
+
+2.Create new ipv4 policy
+===================================================================================
+we will clone existing ipv4 policy to create new policy and edit new policy
+
+existing ipv4 policy name :default_ipv4
+new policy:New_policy
+
+cmd:ipfilter --clone <New_policy> -from <default_ipv4>
+cmd:ipfilter --save New_policy
+
+cmd:ipfilter --show New_policy
+verify newly created policy, it will be having all the rules of policy from which it created.
+
+3.Delete the rule in which port 23 is permit
+=========================================================================================
+cmd:ipfilter ---delrule <New_policy> -rule 2
+cmd:ipfilter --show New_policy    ->verify if rule is deleted or not
+
+4.Add rule to deny port 23
+===================================================================================
+cmd:ipfilter --addrule <New_policy> -rule 2 -sip any -dp 23 -proto tcp -act deny
+
+sip:source ip
+dp:port number
+act:action is denying, it can be permit if you want to allow.
+
+cmd:ipfilter --show
+verify if rule is added or not
+
+Policy will be in modified state save it, it will turn to defined state
+
+cmd:ipfilter --save New_policy
+
+now it will be in defined state
+
+5.Activate the New_policy
+==================================================================================
+
+cmd:ipfilter --activate <New_policy>
+
+cmd:ipfilter --show
+verify the state of New_policy will be active
+
+

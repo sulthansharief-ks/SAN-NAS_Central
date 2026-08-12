@@ -1,0 +1,11 @@
+Port states:
+
+https://www.storageinfra.com/brocade-san-switch-port-states/#:~:text=Brocade%20SAN%20Switch%20port%20states%20%20%20,of%20syn%20...%20%207%20more%20rows%20
+
+TOR switches
+https://www.fiberopticshare.com/top-of-rack-switch.html
+
+
+
+PORTERRSHOW Troubleshooting 
+https://kb.netapp.com/Advice_and_Troubleshooting/Data_Protection_and_Security/MetroCluster/What_is_the_information_given_from_a_portErrShow_output_on_a_Brocade_switch#:~:text=Disc%20c3%3A%20Discard%20class%203%20errors%20could%20be,unreachable%2C%20zone%20discard%2C%20or%20other%20reasons%20for%20discard.
